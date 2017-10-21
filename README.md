@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 826web-front
 
 > A Vue.js project
@@ -19,3 +20,6 @@ npm run build --report
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+=======
+# 826web_front
+>>>>>>> a022df77a7b70b2a9bb55b240768eade233f0e96
