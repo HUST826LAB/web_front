@@ -63,6 +63,18 @@ export default {
             element["on" + type] = handler;
         }
     }
+    //查找url参数
+    function getUrl () {
+      var obj = {};
+      var arr = window.location.search.substr(1).split('&')
+      for(let i =0;i<arr.length;i++){
+        arr[i]=arr[i].split('=')
+      }
+      arr.forEach(function (v) {
+        obj[v[0]] = v[1];
+      })
+      return obj
+    } 
     function removeEvent(elem, type, handler) {
         if (elem.removeEventListener) {
             elem.removeEventListener(type, handler, false);
@@ -76,12 +88,12 @@ export default {
         if (lock) {
             lock = false;
             var ev = 'ontouchstart' in document ? e.touches[0] : e;
-            console.log(ev.pageX,canX)
             var x = ev.pageX - canX;
             var y = ev.pageY - canY;
             ox = x*2;
             oy = y*2;
             oTime = new Date().getTime();
+            e.preventDefault()
             addHandler(canvas, touchmove, move);
         }
 
@@ -89,6 +101,7 @@ export default {
     }
     function move(e) {
         // alert(new Date().getTime() -oTime)
+        addHandler(document, touchend, up);
         var ev = 'ontouchstart' in document ? e.touches[0] : e;
         var x = (ev.pageX - canX)*2;
         var y = (ev.pageY - canY)*2;
@@ -100,28 +113,32 @@ export default {
     }
     function up(e) {
         removeEvent(canvas, touchmove, move)
+
         var ev = 'ontouchstart' in document ? e.touches[0] : e;
         oTime = new Date().getTime() - oTime;
         removeEvent(document, touchend, up)
         var postData = $this.postData;
+        var obj = getUrl();
         postData.coordinate = pointArr.join(',')
         postData.time_len = oTime.toString();
         //获取用户设备
         navigator.userAgent ? postData.device = navigator.userAgent : undefined;
-        postData.referee = store.state.referee.toString();
-        postData.user_id = store.state.user_id.toString();
-        postData.group = store.state.group.toString();
+        postData.referee = obj.referree ? obj.referree.toString() : '0';
+        postData.user_id = obj.user_id ? obj.user_id.toString() : '0';
+        obj.group ? postData.group = obj.group.toString() : undefined;
         console.log(postData)
-        console.log(postData.coordinate.length)
         var oJSON = JSON.stringify(postData)
         console.log(oJSON)
         getData('/gameMain','post',oJSON).then((res) => {
-            console.log(res.bodyText)
-             alert(JSON.parse(res.bodyText).data.score)
+            // alert(JSON.parse(res.bodyText).data.score)
+            var data = JSON.parse(res.bodyText).data;
+            store.commit('setScore', data.score)
+            window.location.href = '/signUp' + location.search + '&res_id=' + data.res_id;
         })
+
     }
-    addHandler(canvas, touchdown, down);
-    addHandler(document, touchend, up);
+
+        addHandler(canvas, touchdown, down);
 
     function draw(ox, oy, x, y) {
         ctx.beginPath();
@@ -133,6 +150,16 @@ export default {
         ctx.closePath();                
         ctx.stroke()
     }
+    if (location.href.indexOf("&xyz=") < 0) {
+        location.href = location.href + "&xyz=" + Math.random();
+        if(window.history.replaceState){
+            window.history.replaceState(location.href + "&xyz=" + Math.random(),null,null)
+        }else{
+            location.href = location.href + "&xyz=" + Math.random();
+        }
+       
+    }
+    
   }
   
 }
@@ -144,6 +171,6 @@ export default {
   #canvas{
     width:3.75rem;
     height:5rem;
-    margin:.125rem auto;
+    margin:0 auto;
   }
 </style>

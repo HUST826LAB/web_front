@@ -1,27 +1,33 @@
 
 <template>
-  <div class="game" transition="fadeOutLeft">
+  <div>
+  <div class="game">
     <draw></draw>
     <div class="control">
       
     </div>
   </div>
+  </div>
+  
 </template>
 
 <script>
 import draw from '@/components/draw'
 import myList from '@/components/my-list'
+import myHeader from '@/components/my-header'
 export default {
   name: 'app',
   components:{
-        draw
-    },
+        draw,
+  }
+
+  
 }
 </script>
 
 <style scoped>
 
   .game{
-    padding:20px 0;
+    padding:20px 0 0 0;
   }
 </style>

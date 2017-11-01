@@ -1,11 +1,11 @@
 
 <template>
   <div class="wrapper">
-    <div class="online-num">在线人数{{data.resCount}}</div>
+    <div class="online-num">参与人数{{data.resCount}}</div>
     <my-list :oData="data"></my-list>
     <div class="middle">
       <img src="../assets/index-middle.jpg" alt="">
-      <router-link to="game"  class="start" tag="button">play</router-link >
+      <router-link :to="'game'+url"  class="start" tag="button">play</router-link >
     </div>
   </div>
 </template>
@@ -21,6 +21,7 @@ export default {
     return {
       data:{},
       giveData:'',
+      url:'?none=1'
     }
   },
   components:{
@@ -31,20 +32,26 @@ export default {
    
   },
   mounted:function () {
-    console.log('index')
     if(window.location.search) {
-      var arr = window.location.search.substr(1).split('&')
-      for(let i =0;i<arr.length;i++){
-        arr[i]=arr[i].split('=')
-      }
-      console.log(arr)
-      store.commit('setReferee',arr[0][1])
-      store.commit('setGroup',arr[1][1])
+      this.url = window.location.search;
+      var obj = getUrl();
+      store.commit('setReferee',obj['referee'])
+      store.commit('setGroup',obj['group'])
     }
         getData('/index').then((res)=>{
         this.data = res.body.data
       })
-      
+    function getUrl () {
+      var obj = {};
+      var arr = window.location.search.substr(1).split('&')
+      for(let i =0;i<arr.length;i++){
+        arr[i]=arr[i].split('=')
+      }
+      arr.forEach(function (v) {
+        obj[v[0]] = v[1];
+      })
+      return obj
+    } 
   },
   methods:{
    

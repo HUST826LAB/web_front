@@ -7,6 +7,7 @@ export default new Vuex.Store({
     referee: 0,
     user_id: 0,
     group: '',
+    score: 0,
   },
   mutations: {
     setReferee(state, data) {
@@ -17,6 +18,9 @@ export default new Vuex.Store({
     },
     setGroup(state, data) {
       state.group = data
+    },
+    setScore(state, data) {
+      state.score = data
     }
   },
 

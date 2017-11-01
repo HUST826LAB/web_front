@@ -2,18 +2,18 @@
   <div class="my-list">
       <ul>
         个人排行榜
-      <li v-for="(gold,index) in gold">
-        <span>{{index+1}}.</span>
-        <span>{{gold.uname ? gold.uname:gold.username}}</span>
-        <span>{{gold.gold}}</span>
-      </li>
-    </ul>
-      <ul>
-        团体排行榜
       <li v-for="(score,index) in score">
         <span>{{index + 1}}.</span>
         <span>{{score.uname ? score.uname:score.username}}</span>
         <span>{{score.score}}</span>
+      </li>
+    </ul>
+      <ul>
+        团体排行榜
+      <li v-for="(group,index) in group">
+        <span>{{index + 1}}.</span>
+        <span>{{group.name}}</span>
+        <span>{{group.score >= 100000 ? group.score / 10000+'万' : group.score}}</span>
       </li>
     </ul>
     
@@ -45,8 +45,8 @@ export default {
     
   },
   computed:{
-    gold:function () {
-      return this.oData.gold ? this.oData.gold.splice(0,3) : 0
+    group:function () {
+      return this.oData.group ? this.oData.group.splice(0,3) : 0
     },
     score:function () {
       return this.oData.score ? this.oData.score.splice(0,3) : 0

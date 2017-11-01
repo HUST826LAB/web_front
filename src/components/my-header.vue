@@ -1,5 +1,6 @@
 <template>
   <header :style="{height: height + 'px',background:color,color:fontColor,fontSize:fontSize+'px'}" >
+    <button @click="goBack">返回</button>
     <slot class="logo" name="logo"></slot>
     <h1 class="title" :style="{lineHeight:height+'px'}">{{title}}</h1>
   </header>  
@@ -33,6 +34,12 @@ export default {
   data () {
     return {
     }
+  },
+  methods:{
+    goBack:function (){
+        history.go(-2)
+        
+    }
   }
 }
 </script>
@@ -51,20 +58,7 @@ export default {
   .title{
     height: 100%;
   }
-  
-</style>
-Array.prototype.reverse = function () {
-  this.push(this.shift())
-  return this
-}
-
-
-
-function wait () {
-  var date = new Date().getDate();
-  while(new Date().getDate() - date < 3600000){
-
+  button{
+    color:#fff;
   }
-  arr.push(arr.shift())
-  wait()
-}
+</style>
