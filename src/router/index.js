@@ -10,6 +10,8 @@ const game = () =>
   import ('@/pages/game');
 const signUp = () =>
   import ('@/pages/signUp')
+const score = () =>
+  import ('@/pages/score')
 
 Vue.use(Router)
 export default new Router({
@@ -26,6 +28,10 @@ export default new Router({
     {
       path: '/signUp',
       component: signUp
+    },
+    {
+      path: '/score',
+      component: score
     }
   ]
 })

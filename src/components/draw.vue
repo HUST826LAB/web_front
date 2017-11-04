@@ -5,11 +5,23 @@
     <canvas id="canvas" :width="canvasWidth" :height="canvasHeight" :style="{width:canvasWidth/2 + 'px',height:canvasHeight/2 + 'px'}">
 
     </canvas>
+    <transition name="fade">
+        <div class="drump" v-show="isCircle">
+            <div>
+                <span>貌似画的不是圆呢</span>
+                <br>
+                <span>重新画一个吧n(*≧▽≦*)n</span>
+            </div>
+            <button @click="reload">好的</button>
+        </div>
+    </transition>
+    <router-link  tag="a" class="go-score" :to="{path:('/score?s=' + this.score)}">完成</router-link>
   </div>
 </template>
 <script>
 import store from '@/store/vuex'
 import getData from '@/server/vue-resource'
+import doCookie from '@/server/docookie'
 export default {
   name: 'draw',
   data () {
@@ -17,7 +29,11 @@ export default {
       msg: 'Welcome to Your Vue.js App',
       canvasWidth: 250,
       canvasHeight: 250,
-      postData: {}
+      postData: {},
+      isCircle: false,
+      canvas: null,
+      path:'',
+      score:0,
     }
   },
   created:function () {
@@ -29,6 +45,7 @@ export default {
 
   },
   mounted:function () {
+    var $self = this;
     var canvas = document.querySelectorAll("#canvas")[0];
     var ctx = canvas.getContext('2d');
     var oData = '';
@@ -37,7 +54,8 @@ export default {
     var cBeginX = this.canvasWidth / 2;
     var cBeginY = this.canvasHeight / 2;
     var cR = Math.min(this.canvasHeight,this.canvasWidth) / 2.5;
-    var pointArr = []
+    var pointArr = [];
+    this.canvas = ctx;
     this.postData.circle_x = cBeginX.toString();
     this.postData.circle_y = cBeginY.toString();
     this.postData.circle_r = cR.toString();
@@ -125,15 +143,34 @@ export default {
         navigator.userAgent ? postData.device = navigator.userAgent : undefined;
         postData.referee = obj.referree ? obj.referree.toString() : '0';
         postData.user_id = obj.user_id ? obj.user_id.toString() : '0';
-        obj.group ? postData.group = obj.group.toString() : undefined;
+        obj.group ? postData.group = obj.group.toString() : postData.group = '0';
+        postData.cookie_id = doCookie('get', 'cookie_id');
         console.log(postData)
         var oJSON = JSON.stringify(postData)
         console.log(oJSON)
         getData('/gameMain','post',oJSON).then((res) => {
+            console.log(res.bodyText)
+            
             // alert(JSON.parse(res.bodyText).data.score)
             var data = JSON.parse(res.bodyText).data;
-            store.commit('setScore', data.score)
-            window.location.href = '/signUp' + location.search + '&res_id=' + data.res_id;
+            $self.resData = data;
+            if(JSON.parse(res.bodyText).msg == '不是圆'){
+                ctx.clearRect(0,0,$self.canvasWidth,$self.canvasHeight);
+                ctx.beginPath();
+                ctx.arc(cBeginX, cBeginY, cR, 0, Math.PI * 2, true);
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 20
+                ctx.stroke();
+                lock = true;
+                $self.isCircle = true;
+                
+            }else{
+                window.location.href = '/score' + location.search + '&res_id=' + data.res_id + '&score=' + data.score + '&sum=' + data.sum + '&sumLevel=' + data.sum_level;
+                // $self.$router.push({path:'/score'+ '&score=' + data.score + '&sum=' + data.sum + '&sumLevel=' + data.sum_level})
+                // $self.score=data.score;
+                // $self.path = '/score?' +'s=' + data.score 
+            }
+            // store.commit('setScore', JSON.parse(res.bodyText).data.score)
         })
 
     }
@@ -160,6 +197,15 @@ export default {
        
     }
     
+  },
+  methods:{
+    reload(){
+        this.isCircle = false;
+         
+    },
+    goScore(){
+
+    }
   }
   
 }
@@ -173,4 +219,51 @@ export default {
     height:5rem;
     margin:0 auto;
   }
+  .drump{
+      position :absolute;
+      width: 2.6666666666666665rem;
+      height:1.6666666666666667rem;
+      border:3px solid #000;
+      background: #fff;
+      top:0;
+      left:0;
+      bottom:0;
+      right:0;
+      margin:auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+  }
+  .drump button{
+      width:1.3333333333333333rem;
+      height:0.3333333333333333rem;
+      border:3px solid #000;
+      background:#fff;
+      font-size:0.16666666666666666rem;
+      line-height: 0.3333333333333333rem;
+
+  }
+  /* 开始过渡阶段,动画出去阶段 */
+.fade-enter-active,.fade-leave-active{
+  transition: all 0.5s ease-out;
+}
+/* 进入开始 */
+.fade-enter{
+  transform: translatey(-0.6666666666666666rem);
+  opacity: 0;
+}
+/* 出去终点 */
+.fade-leave-active{
+  transform: translateY(0.6666666666666666rem);
+  opacity: 0;
+}
+.go-score{
+    width: 2.6666666666666665rem;
+    height:0.56666666666666666rem;
+    border:3px solid #000;
+    background:#fff;
+    font-size:0.2rem;
+    line-height:0.26666666666666666rem;
+}
 </style>

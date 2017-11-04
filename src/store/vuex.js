@@ -1,5 +1,6 @@
 import Vue from 'Vue';
-import Vuex from 'Vuex'
+import Vuex from 'Vuex';
+import doCookie from '@/server/docookie'
 Vue.use(Vuex)
 
 export default new Vuex.Store({

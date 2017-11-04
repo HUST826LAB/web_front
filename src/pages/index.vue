@@ -15,6 +15,7 @@ import store from '@/store/vuex'
 import myHeader from '@/components/my-header'
 import myList from '@/components/my-list'
 import getData from '@/server/vue-resource'
+import doCookie from '@/server/docookie'
 export default {
   name: 'app',
   data:function () {
@@ -40,6 +41,9 @@ export default {
     }
         getData('/index').then((res)=>{
         this.data = res.body.data
+        if(!doCookie('get','cookie_id')){
+          doCookie('set','cookie_id',res.body.data.cookie_id)
+        }
       })
     function getUrl () {
       var obj = {};
@@ -52,6 +56,8 @@ export default {
       })
       return obj
     } 
+    console.log(doCookie('get', 'd'))
+   
   },
   methods:{
    

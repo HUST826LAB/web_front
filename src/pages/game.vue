@@ -19,8 +19,9 @@ export default {
   name: 'app',
   components:{
         draw,
-  }
-
+  },
+  
+  
   
 }
 </script>
