@@ -2,10 +2,11 @@
 <template>
   <div class="score">
     <div class="header">
-      <router-link tag="button" :to="{path:username ? '/mine' : '/signIn'}" class="sign-in">{{username?username:'登录'}}</router-link>
-      <button>分享</button>
+      <router-link tag="button" :to="{path:username ? '/' : '/signIn'}" class="sign-in">{{username?'主页':'登录'}}</router-link>
+      <button @click="share">分享</button>
     </div>
     <div class="score-wrapper">
+      <h1>{{username ? username :''}}</h1>
       <div class="gold">
         <span>金币:</span><span>{{gold}}</span>
       </div>
@@ -19,11 +20,15 @@
         <span>全体排名:</span><span>{{sumLevel}}/{{sum}}</span>
       </div>
     </div>
-    <img class="res" src="../assets/res.jpg" alt="">
-    <div class="footer">
-      <router-link tag="button" :to="{path:username ? '/mine':'/signUp',query:{resId:this.$route.query.resId}}">{{username ? '空间' : '注册'}}</router-link>
-      <router-link tag="button" to="/game?none=1">{{username ? '再来一局' : '再看看'}}</router-link>
+    <div>
+       <img class="res" src="../assets/res.jpg" alt="">
+      <div class="footer">
+        <router-link tag="button" :to="{path:username ? '/mine':'/signUp',query:{resId:this.$route.query.resId}}">{{username ? '空间' : '注册'}}</router-link>
+        <router-link tag="button" to="/game?none=1">{{username ? '再来一局' : '再看看'}}</router-link>
+
+      </div>
     </div>
+   
   </div>
   
 </template>
@@ -31,6 +36,7 @@
 <script>
 import store from '@/store/vuex'
 import doCookie from '@/server/docookie'
+import qqShare from '@/server/qqShare'
 export default {
   name: 'app',
   data:function () {
@@ -41,16 +47,19 @@ export default {
       gold:0,
       group:0,
       groupLevel:0,
-      username:doCookie('get', 'username')
+      username:doCookie('get', 'username'),
+      link : ''
     }
   },
   mounted:function (){
+    var $self = this;
     this.score = this.$route.query.score;
     this.sum = this.$route.query.sum;
     this.sumLevel = this.$route.query.sumLevel;
     this.gold = this.$route.query.gold;
     this.group = this.$route.query.group;
     this.groupLevel = this.$route.query.groupLevel;
+   
   },
   ready:function() {
     
@@ -58,6 +67,11 @@ export default {
   components:{
     
   },
+  methods:{
+    share(){
+      // window.location = this.link
+    }
+  }
   
   
   
@@ -76,6 +90,7 @@ export default {
     align-items:center;
     overflow: hidden;
     justify-content: space-around;
+    height: 100vh;
   }
   .header{
     width:90vw;
@@ -102,7 +117,7 @@ export default {
     flex-direction: column;
     align-items: center;
     font-size:0.26666666666666666rem;
-    margin-top:0.6666666666666666rem;
+    /* margin-top:0.3666666666666666rem; */
   }
   .score-wrapper div{
     width:2.6333333333333335rem;

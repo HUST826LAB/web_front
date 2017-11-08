@@ -1,23 +1,10 @@
 
 <template>
   <div class="score">
-    <div class="score-wrapper">
-      <div class="gold">
-        <span>金币:</span><span>{{gold}}</span>
-      </div>
-      <div class="score1">
-        <span>分数:</span><span>{{score}}</span>
-      </div>
-      <div class="group">
-        <span>组内排名:</span><span>{{groupLevel}}/{{group}}</span>
-      </div>
-      <div class="sum">
-        <span>全体排名:</span><span>{{sumLevel}}/{{sum}}</span>
-      </div>
-    </div>
+   正在建设中
     <div class="footer">
-      <router-link tag="button" :to="{path:username ? '/mine':'/signUp',query:{resId:this.$route.query.resId}}">{{username ? '空间' : '注册'}}</router-link>
-      <router-link tag="button" to="/game?none=1">{{username ? '再来一局' : '再看看'}}</router-link>
+      <router-link tag="button" :to="{path:'/game?none=1',query:{resId:this.$route.query.resId}}">游戏</router-link>
+      <button @click="signOut">退出登录</button>
     </div>
   </div>
   
@@ -36,7 +23,6 @@ export default {
       gold:0,
       group:0,
       groupLevel:0,
-      username:doCookie('get', 'username')
     }
   },
   mounted:function (){
@@ -53,6 +39,12 @@ export default {
   components:{
     
   },
+  methods:{
+    signOut(){
+      doCookie('set','username','')
+      this.$router.push({path:'/'})
+    }
+  }
   
   
   
@@ -144,5 +136,6 @@ export default {
     font-size:0.6rem;
     color:red;
     font-weight: bolder;
+    line-height:0.66666rem;
   }
 </style>

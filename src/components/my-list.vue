@@ -88,6 +88,7 @@ export default {
     line-height:.4rem;
   }
   li{
+    width:100%;
     display: flex;
     justify-content: space-between;
     flex-wrap: nowrap;

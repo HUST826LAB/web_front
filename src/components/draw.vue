@@ -21,7 +21,7 @@
                 <button @click="reload">取消</button>
         </div>
     </transition>
-    <!-- <router-link  tag="a" class="go-score" :to="{path:('/score'),query:score}">完成</router-link> -->
+    <router-link v-show="finish" tag="button" class="go-score" :to="{path:'/score', query:obj}">查看成绩</router-link>
   </div>
 </template>
 <script>
@@ -41,7 +41,9 @@ export default {
       path:'',
       score:0,
       loading:false,
-      warn:'玩命加载中...'
+      warn:'玩命加载中...',
+      obj:{},
+      finish:false
     }
   },
   created:function () {
@@ -137,12 +139,14 @@ export default {
         oData = oData + x.toString() + ',' + y.toString() + ',';
         event.preventDefault();
     }
+    //抬起请求数据
     function up(e) {
         removeEvent(canvas, touchmove, move)
 
         var ev = 'ontouchstart' in document ? e.touches[0] : e;
         oTime = new Date().getTime() - oTime;
         removeEvent(document, touchend, up)
+        //数据交互部分
         var postData = $this.postData;
         var obj = getUrl();
         postData.coordinate = pointArr.join(',')
@@ -174,12 +178,20 @@ export default {
                 $self.isCircle = true;
                 
             }else{
-                store.commit('setScore', data.score)
                 // window.location.href = '/score' + location.search + '&res_id=' + data.res_id + '&score=' + data.score + '&sum=' + data.sum + '&sumLevel=' + data.sum_level;
                 // $self.$router.push({path:'/score', params:{score:data.score}})
                 // $self.score=data.score;
                 // $self.path = '/score?' +'s=' + data.score 
-                $self.$router.push({path:'/score', query:{score:data.score,res_id:data.res_id,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}})
+                // $self.$router.push({path:'/score', query:{score:data.score,res_id:data.res_id,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}})
+                // doCookie('set','score', 100)
+                // delCookie('score');
+                // document.cookie = 'score' + '=' + res.body.data.score;
+                // $self.$router.push({path:'/score'})
+                $self.obj = {score:data.score,res_id:data.res_id,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}
+                $self.finish = true;
+
+
+
             }
             // store.commit('setScore', JSON.parse(res.bodyText).data.score)
         },()=>{
@@ -209,7 +221,7 @@ export default {
         }
        
     }
-    
+   
   },
   methods:{
     reload(){
@@ -220,7 +232,6 @@ export default {
 
     }
   }
-  
 }
 
 </script>
@@ -279,5 +290,6 @@ export default {
     background:#fff;
     font-size:0.2rem;
     line-height:0.26666666666666666rem;
+    border-radius: 30px;
 }
 </style>

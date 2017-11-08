@@ -5,7 +5,6 @@
     <draw></draw>
   </div>
   </div>
-  
 </template>
 
 <script>
@@ -26,7 +25,6 @@ export default {
 </script>
 
 <style scoped>
-
   .game{
     padding:20px 0 0 0;
   }
