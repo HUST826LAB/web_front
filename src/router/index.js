@@ -9,9 +9,13 @@ const index = () =>
 const game = () =>
   import ('@/pages/game');
 const signUp = () =>
-  import ('@/pages/signUp')
+  import ('@/pages/signUp');
+const signIn = () =>
+  import ('@/pages/signIn')
 const score = () =>
   import ('@/pages/score')
+const mine = () =>
+  import ('@/pages/mine')
 
 Vue.use(Router)
 export default new Router({
@@ -32,6 +36,14 @@ export default new Router({
     {
       path: '/score',
       component: score
+    },
+    {
+      path: '/signIn',
+      component: signIn
+    },
+    {
+      path: '/mine',
+      component: mine
     }
   ]
 })

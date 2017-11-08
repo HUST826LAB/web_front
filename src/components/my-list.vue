@@ -87,6 +87,18 @@ export default {
     font-weight:bold;
     line-height:.4rem;
   }
+  li{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+  ul:first-child li span:nth-child(2){
+    width:300px;
+    height: .4rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   /* li{
     position: relative;
   }

@@ -17,6 +17,15 @@
       <button @click="submit">确认</button>
     </div>
     <img class="signUp-2" src="../assets/signUp-2.jpg" alt="">
+    <transition name="fade">
+        <div class="drump" v-show="alert">
+            <div>
+                <span>注册成功</span>
+                <br>
+                <span>马上跳转O(∩_∩)O~~</span>
+            </div>
+        </div>
+    </transition>
   </div>
   
 </template>
@@ -24,6 +33,7 @@
 <script>
 import getData from '@/server/vue-resource'
 import sha from '@/server/sha'
+import docookie from '@/server/docookie'
 export default {
   name: 'app',
   data:function () {
@@ -35,7 +45,8 @@ export default {
       password1:'',
       passwordText:'',
       passwordState: false,
-      postData:{}
+      postData:{},
+      alert:false
     }
   },
   components:{
@@ -45,20 +56,30 @@ export default {
       var postData = this.postData
       if(this.nameState && this.passwordState) {
         var sha1 = new sha('SHA-1','TEXT')
+        var $self = this
         sha1.update(this.password)
         postData.password = sha1.getHash('HEX')
         postData.username = this.uname;
-        postData.res_id = getUrl().res_id;
+        postData.res_id =this.$route.query.resId.toString();
+        console.log(postData)
         getData('/signUp','post',JSON.stringify(postData)).then((res)=>{
           console.log(res)
           if(res.status == 200) {
-            alert('注册成功')
-            setTimeout(()=>{
-              location.href = 'game?none=1'
-            },1000)
+            if(res.body.msg=="成功"){
+              docookie('set','username', res.body.data.username)
+              docookie('set','user_id', res.body.data.user_id)
+              $self.alert = true;
+              setTimeout(function () {
+                $self.$router.push({path:'/game?none=1'})
+              },1000)
+            }else{
+              alert('注册失败，再试一下吧')
+            }
+            // setTimeout(()=>{
+            //   location.href = 'game?none=1'
+            // },1000)
+            // $self.$router.push({path:'/'})
           }
-        }).catch(()=>{
-          alert('注册失败，请重新注册')
         })
       }
         //查找url参数
@@ -171,4 +192,43 @@ export default {
     color:red;
     margin-bottom:.4366rem;
   }
+    .drump{
+      position :absolute;
+      width: 2.6666666666666665rem;
+      height:1.6666666666666667rem;
+      border:3px solid #000;
+      background: #fff;
+      top:0;
+      left:0;
+      bottom:0;
+      right:0;
+      margin:auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+  }
+  .drump button{
+      width:1.3333333333333333rem;
+      height:0.3333333333333333rem;
+      border:3px solid #000;
+      background:#fff;
+      font-size:0.16666666666666666rem;
+      line-height: 0.3333333333333333rem;
+
+  }
+  /* 开始过渡阶段,动画出去阶段 */
+.fade-enter-active,.fade-leave-active{
+  transition: all 0.5s ease-out;
+}
+/* 进入开始 */
+.fade-enter{
+  transform: translatey(-0.6666666666666666rem);
+  opacity: 0;
+}
+/* 出去终点 */
+.fade-leave-active{
+  transform: translateY(0.6666666666666666rem);
+  opacity: 0;
+}
 </style>

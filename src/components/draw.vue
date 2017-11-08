@@ -15,7 +15,7 @@
             <button @click="reload">好的</button>
         </div>
     </transition>
-    <router-link  tag="a" class="go-score" :to="{path:('/score?s=' + this.score)}">完成</router-link>
+    <!-- <router-link  tag="a" class="go-score" :to="{path:('/score'),query:score}">完成</router-link> -->
   </div>
 </template>
 <script>
@@ -142,8 +142,8 @@ export default {
         //获取用户设备
         navigator.userAgent ? postData.device = navigator.userAgent : undefined;
         postData.referee = obj.referree ? obj.referree.toString() : '0';
-        postData.user_id = obj.user_id ? obj.user_id.toString() : '0';
-        obj.group ? postData.group = obj.group.toString() : postData.group = '0';
+        postData.user_id = doCookie('get', 'user_id') ? doCookie('get', 'user_id') : '0';
+        obj.group ? (postData.group = obj.group.toString()) : postData.group = '0';
         postData.cookie_id = doCookie('get', 'cookie_id');
         console.log(postData)
         var oJSON = JSON.stringify(postData)
@@ -165,10 +165,12 @@ export default {
                 $self.isCircle = true;
                 
             }else{
-                window.location.href = '/score' + location.search + '&res_id=' + data.res_id + '&score=' + data.score + '&sum=' + data.sum + '&sumLevel=' + data.sum_level;
-                // $self.$router.push({path:'/score'+ '&score=' + data.score + '&sum=' + data.sum + '&sumLevel=' + data.sum_level})
+                store.commit('setScore', data.score)
+                // window.location.href = '/score' + location.search + '&res_id=' + data.res_id + '&score=' + data.score + '&sum=' + data.sum + '&sumLevel=' + data.sum_level;
+                // $self.$router.push({path:'/score', params:{score:data.score}})
                 // $self.score=data.score;
                 // $self.path = '/score?' +'s=' + data.score 
+                $self.$router.push({path:'/score', query:{score:data.score,res_id:data.res_id,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}})
             }
             // store.commit('setScore', JSON.parse(res.bodyText).data.score)
         })

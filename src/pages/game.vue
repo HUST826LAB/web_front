@@ -3,9 +3,6 @@
   <div>
   <div class="game">
     <draw></draw>
-    <div class="control">
-      
-    </div>
   </div>
   </div>
   
@@ -20,7 +17,9 @@ export default {
   components:{
         draw,
   },
-  
+  methods:{
+   
+  }
   
   
 }

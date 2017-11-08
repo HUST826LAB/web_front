@@ -1,10 +1,6 @@
 
 <template>
   <div class="score">
-    <div class="header">
-      <router-link tag="button" :to="{path:username ? '/mine' : '/signIn'}" class="sign-in">{{username?username:'登录'}}</router-link>
-      <button>分享</button>
-    </div>
     <div class="score-wrapper">
       <div class="gold">
         <span>金币:</span><span>{{gold}}</span>
@@ -19,7 +15,6 @@
         <span>全体排名:</span><span>{{sumLevel}}/{{sum}}</span>
       </div>
     </div>
-    <img class="res" src="../assets/res.jpg" alt="">
     <div class="footer">
       <router-link tag="button" :to="{path:username ? '/mine':'/signUp',query:{resId:this.$route.query.resId}}">{{username ? '空间' : '注册'}}</router-link>
       <router-link tag="button" to="/game?none=1">{{username ? '再来一局' : '再看看'}}</router-link>
