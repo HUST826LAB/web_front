@@ -85,13 +85,16 @@ export default {
   .header button{
     font-family: 'huakang';
     height:0.3333333333333333rem;
-    width:0.6666666666666666rem;
+    width:0.8666666666666666rem;
     font-size:0.26666666666666666rem;
     line-height:0.2333333333333333rem;
     border:3px solid #000;
     background: #fff;
     border-radius: 20px;
     text-align:center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   .score-wrapper{
     display: flex;
@@ -102,10 +105,10 @@ export default {
     margin-top:0.6666666666666666rem;
   }
   .score-wrapper div{
-    width:2.3333333333333335rem;
+    width:2.6333333333333335rem;
     display: flex;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: center;
     margin-bottom:0.06666666666666666rem;
   }
   .score-wrapper span:first-child{
