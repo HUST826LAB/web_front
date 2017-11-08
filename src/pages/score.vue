@@ -70,13 +70,12 @@ export default {
     src: url('../assets/华康娃娃体简W5.ttf');
   }
   .score{
-  
     font-family: 'huakang';
     display: flex;
     flex-direction: column;
     align-items:center;
-    height:100vh;
     overflow: hidden;
+    justify-content: space-around;
   }
   .header{
     width:90vw;

@@ -91,13 +91,15 @@ export default {
     display: flex;
     justify-content: space-between;
     flex-wrap: nowrap;
+    max-width: 1rem;
   }
   ul:first-child li span:nth-child(2){
-    width:300px;
+    width:1rem;
     height: .4rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-shrink: 3;
   }
   /* li{
     position: relative;

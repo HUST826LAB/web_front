@@ -15,6 +15,12 @@
             <button @click="reload">好的</button>
         </div>
     </transition>
+    <transition name="fade">
+        <div class="drump" v-show="loading">
+                <span>{{warn}}</span>
+                <button @click="reload">取消</button>
+        </div>
+    </transition>
     <!-- <router-link  tag="a" class="go-score" :to="{path:('/score'),query:score}">完成</router-link> -->
   </div>
 </template>
@@ -34,6 +40,8 @@ export default {
       canvas: null,
       path:'',
       score:0,
+      loading:false,
+      warn:'玩命加载中...'
     }
   },
   created:function () {
@@ -148,9 +156,10 @@ export default {
         console.log(postData)
         var oJSON = JSON.stringify(postData)
         console.log(oJSON)
+        $this.loading = true;
         getData('/gameMain','post',oJSON).then((res) => {
             console.log(res.bodyText)
-            
+            $this.loading = false;
             // alert(JSON.parse(res.bodyText).data.score)
             var data = JSON.parse(res.bodyText).data;
             $self.resData = data;
@@ -173,6 +182,8 @@ export default {
                 $self.$router.push({path:'/score', query:{score:data.score,res_id:data.res_id,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}})
             }
             // store.commit('setScore', JSON.parse(res.bodyText).data.score)
+        },()=>{
+            $self.warn = '网络貌似不通呢+_+'
         })
 
     }
@@ -203,7 +214,7 @@ export default {
   methods:{
     reload(){
         this.isCircle = false;
-         
+        this.loading = false;
     },
     goScore(){
 
@@ -236,6 +247,7 @@ export default {
       flex-direction: column;
       justify-content: space-around;
       align-items: center;
+      border-radius: 40px;
   }
   .drump button{
       width:1.3333333333333333rem;
