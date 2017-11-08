@@ -82,7 +82,7 @@ export default {
     color:#000;
   }
   li{
-    text-align:left;
+    text-align:center;
     font-size:0.155rem;
     font-weight:bold;
     line-height:.4rem;
