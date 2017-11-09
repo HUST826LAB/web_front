@@ -42,6 +42,7 @@ export default {
   methods:{
     signOut(){
       doCookie('set','username','')
+      doCookie('set','user_id', '')
       this.$router.push({path:'/'})
     }
   }

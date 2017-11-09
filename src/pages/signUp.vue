@@ -20,7 +20,7 @@
     <transition name="fade">
         <div class="drump" v-show="alert">
             <div>
-                <span>注册成功</span>
+                <span>{{warn}}</span>
                 <br>
                 <span>马上跳转O(∩_∩)O~~</span>
             </div>
@@ -46,7 +46,8 @@ export default {
       passwordText:'',
       passwordState: false,
       postData:{},
-      alert:false
+      alert:false,
+      warn:''
     }
   },
   components:{
@@ -69,11 +70,14 @@ export default {
               docookie('set','username', res.body.data.username)
               docookie('set','user_id', res.body.data.user_id)
               $self.alert = true;
+              $self.warn = '注册成功'
               setTimeout(function () {
                 $self.$router.push({path:'/game?none=1'})
               },1000)
             }else{
-              alert('注册失败，再试一下吧')
+              $self.alert = true;
+              $self.warn = '注册失败，重新打开再试一下吧'
+              doCookie('set','user_id','')
             }
             // setTimeout(()=>{
             //   location.href = 'game?none=1'
@@ -97,7 +101,7 @@ export default {
     },
     check(){
       var uname = this.uname;
-      var reg = /[a-zA-z0-9]/g;
+      var reg = /[a-zA-Z0-9]/g;
       var check = reg.test(uname);
       if(check){
         getData('/checkUsername?username=' + uname,'get').then((res)=>{
