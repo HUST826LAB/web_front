@@ -16,6 +16,10 @@ const score = () =>
   import ('@/pages/score')
 const mine = () =>
   import ('@/pages/mine')
+const draw = () =>
+  import ('@/components/draw')
+const triangle = () =>
+  import ('@/components/draw-triangle')
 
 Vue.use(Router)
 export default new Router({
@@ -28,6 +32,13 @@ export default new Router({
     {
       path: '/game',
       component: game,
+      children: [{
+        path: '',
+        component: draw
+      }, {
+        path: 'triangle',
+        component: triangle
+      }]
     },
     {
       path: '/signUp',

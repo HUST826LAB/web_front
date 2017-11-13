@@ -153,7 +153,7 @@ export default {
     align-items: center;
   }
   .check-res{
-    color:blue;
+    color:red;
   }
   input{
     height:0.38333333333333336rem;

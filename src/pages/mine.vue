@@ -1,11 +1,29 @@
 
 <template>
-  <div class="score">
-   正在建设中
-    <div class="footer">
-      <router-link tag="button" :to="{path:'/game?none=1',query:{resId:this.$route.query.resId}}">游戏</router-link>
-      <button @click="signOut">退出登录</button>
-    </div>
+  <div class="mine">
+    <h1>{{username ? username :''}}</h1>
+      <div class="mine-wrapper">
+        <div class="gold">
+          <span>我的金币:</span><span>{{gold}}</span>
+        </div>
+        <div class="score">
+          <span>最高分数:</span><span>{{score}}</span>
+        </div>
+        <div class="group">
+          <span>所属小组:</span><span>{{groupName}}</span>
+        </div>
+        <div class="group-level" v-show="!groupName == '暂无分组'">
+          <span>组内排名:</span><span>{{groupLevel}}/{{group}}</span>
+        </div>
+        <div class="sum">
+          <span>全体排名:</span><span>{{sumLevel}}/{{sum}}</span>
+        </div>
+      </div>
+      <div class="footer">
+        <router-link tag="button" :to="{path:'/game?none=1'}">游戏</router-link>
+        <button @click="signOut">退出登录</button>
+      </div>
+      
   </div>
   
 </template>
@@ -13,25 +31,40 @@
 <script>
 import store from '@/store/vuex'
 import doCookie from '@/server/docookie'
+import getData from '@/server/vue-resource'
 export default {
   name: 'app',
   data:function () {
     return {
-      score:0,
-      sumLevel :0,
-      sum:0,
-      gold:0,
-      group:0,
-      groupLevel:0,
+      username :'llalllalallalala',
+      score:1000,
+      sumLevel :90,
+      sum:100,
+      gold:149,
+      group:30,
+      groupLevel:10,
+      groupName:'土豆'
     }
   },
   mounted:function (){
-    this.score = this.$route.query.score;
-    this.sum = this.$route.query.sum;
-    this.sumLevel = this.$route.query.sumLevel;
-    this.gold = this.$route.query.gold;
-    this.group = this.$route.query.group;
-    this.groupLevel = this.$route.query.groupLevel;
+    var userId = doCookie('get','user_id')
+    var postData = JSON.stringify({user_id:userId})
+    console.log(postData)
+    var $self = this;
+    getData('/zone','post',postData).then((res)=>{
+      if(res.body.code == 0){
+        var data = res.body.data;
+        $self.gold = data.gold;
+        $self.score = data.score;
+        $self.sumLevel = data.sum_level;
+        $self.sum = data.sum;
+        $self.group = data.sumGroup;
+        $self.groupLevel = data.group_level;
+        $self.groupLevel = data.group_level;
+        $self.groupName = data.group_name ? data.group_name : '暂无分组'
+        $self.username = data.username;
+      }
+    })
   },
   ready:function() {
     
@@ -57,86 +90,53 @@ export default {
     font-family: 'huakang';
     src: url('../assets/华康娃娃体简W5.ttf');
   }
-  .score{
-  
+  .mine{
     font-family: 'huakang';
     display: flex;
     flex-direction: column;
     align-items:center;
     height:100vh;
     overflow: hidden;
+    justify-content: space-around;
   }
-  .header{
-    width:90vw;
+  .mine-wrapper{
     display: flex;
-    justify-content: space-between;
-  }
-  .header button{
-    font-family: 'huakang';
-    height:0.3333333333333333rem;
-    width:0.6666666666666666rem;
-    font-size:0.26666666666666666rem;
-    line-height:0.2333333333333333rem;
-    border:3px solid #000;
-    background: #fff;
-    border-radius: 20px;
-    text-align:center;
-  }
-  .score-wrapper{
-    display: flex;
-    width:80vw;
     flex-direction: column;
-    align-items: center;
-    font-size:0.26666666666666666rem;
-    margin-top:0.6666666666666666rem;
+    justify-content: space-around;
+    font-size:0.3125rem;
+    width:70%;
+    height: 50%;
   }
-  .score-wrapper div{
-    width:2.3333333333333335rem;
+  .mine-wrapper div{
     display: flex;
-    flex-wrap: nowrap;
     justify-content: space-between;
-    margin-bottom:0.06666666666666666rem;
   }
-  .score-wrapper span:first-child{
-    width:1.4333333333333333rem;
-    text-align:right;
-  }
-  .score-wrapper .gold{
+  .mine-wrapper .gold{
     color:goldenrod;
   }
-  .score-wrapper .score1{
+  .mine-wrapper .score{
     color:green;
   }
-  .score-wrapper .group{
+  .mine-wrapper .group{
     color:skyblue;
   }
-  .score-wrapper .sum{
+  .mine-wrapper .group-level{
+    color:deepskyblue;
+  }
+  .mine-wrapper .sum{
     color:red;
   }
-  .res{
-    width:2.3333333333333335rem;
-  }
-  .footer{
-    width:3rem;
+  .footer {
+    width:100%;
     display: flex;
     justify-content: space-around;
   }
-  .footer button{
+  .footer button {
     font-family: 'huakang';
     border:3px solid #000;
     background: #fff;
-    border-radius: 20px;
-    /* width:1.333333333333334rem; */
-    padding:0 .1rem;
-    height:0.3333333333333333rem;
-    font-size:0.23333333333333334rem;
-  }
-  .footer button:first-child{
-    /* width:1.3333333333333333rem; */
-    height: 0.6666666666666666rem;
-    font-size:0.6rem;
-    color:red;
-    font-weight: bolder;
-    line-height:0.66666rem;
+    font-size:0.3125rem;
+    padding:0.0375rem 0.1rem;
+    border-radius:15px;
   }
 </style>

@@ -13,7 +13,7 @@
       <div class="score1">
         <span>分数:</span><span>{{score}}</span>
       </div>
-      <div class="group">
+      <div class="group" v-show="group">
         <span>组内排名:</span><span>{{groupLevel}}/{{group}}</span>
       </div>
       <div class="sum">

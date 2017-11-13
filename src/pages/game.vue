@@ -2,7 +2,7 @@
 <template>
   <div>
   <div class="game">
-    <draw></draw>
+    <router-view></router-view>
   </div>
   </div>
 </template>
