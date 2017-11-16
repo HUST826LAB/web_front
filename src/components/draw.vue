@@ -2,7 +2,7 @@
   <div class="draw">
     <p class="text">按照提供的路径画一个圆</p>
     <p>与之重合度越高则分数越高</p>
-    <canvas id="canvas" :width="canvasWidth" :height="canvasHeight" :style="{width:canvasWidth/2 + 'px',height:canvasHeight/2 + 'px'}">
+    <canvas  id="canvas" :width="canvasWidth" :height="canvasHeight" :style="{width:canvasWidth/2 + 'px',height:canvasHeight/2 + 'px'}">
 
     </canvas>
     <transition name="fade">
@@ -28,6 +28,7 @@
 import store from '@/store/vuex'
 import getData from '@/server/vue-resource'
 import doCookie from '@/server/docookie'
+import match from '@/server/calMatching'
 export default {
   name: 'draw',
   data () {
@@ -74,6 +75,11 @@ export default {
     ctx.strokeStyle = 'red';
     ctx.lineWidth = 20
     ctx.stroke();
+    match.calMatching(canvas);
+    match.canvasData.draw.rgba=[0,128,0,255]
+    // ctx.fillStyle="green";
+    // ctx.fillRect(0,0,600,800);
+    // console.log(ctx.getImageData(0,0,600,800))
     var touchdown = 'ontouchstart' in document ? 'touchstart' : 'mousedown';
     var touchmove = 'ontouchmove' in document ? 'touchmove' : 'mousemove';
     var touchend = 'ontouchend' in document ? 'touchend' : 'mouseup';
@@ -82,6 +88,10 @@ export default {
     var oy = null;
     var oTime = null;
     var $this = this;
+    var one = false;
+    var two = false;
+    var three = false;
+    var four = false;
         var addHandler = function (element, type, handler) {
         if (element.addEventListener) {
             element.addEventListener(type, handler, false);
@@ -138,37 +148,31 @@ export default {
         oy = y;
         oData = oData + x.toString() + ',' + y.toString() + ',';
         event.preventDefault();
+        if(x > cBeginX && y < cBeginY) {
+            one = true;
+        }
+        if(x > cBeginX && y > cBeginY){
+            two = true;
+        }
+        if(x < cBeginX && y > cBeginY){
+            three = true;
+        }
+        if(x < cBeginX && y < cBeginY){
+            four = true;
+        }
     }
     //抬起请求数据
     function up(e) {
         removeEvent(canvas, touchmove, move)
-
+        var imageData = ctx.getImageData(0,0,600,800).data;
+        var len = imageData.length;
         var ev = 'ontouchstart' in document ? e.touches[0] : e;
         oTime = new Date().getTime() - oTime;
         removeEvent(document, touchend, up)
-        //数据交互部分
-        var postData = $this.postData;
-        var obj = getUrl();
-        postData.coordinate = pointArr.join(',')
-        postData.time_len = oTime.toString();
-        //获取用户设备
-        navigator.userAgent ? postData.device = navigator.userAgent : undefined;
-        postData.referee = obj.referree ? obj.referree.toString() : '0';
-        postData.user_id = doCookie('get', 'user_id') ? doCookie('get', 'user_id') : '0';
-        obj.group ? (postData.group = obj.group.toString()) : postData.group = '0';
-        postData.cookie_id = doCookie('get', 'cookie_id');
-        console.log(postData)
-        var oJSON = JSON.stringify(postData)
-        console.log(oJSON)
-        $this.loading = true;
-        getData('/gameMain','post',oJSON).then((res) => {
-            console.log(res.bodyText)
-            $this.loading = false;
-            // alert(JSON.parse(res.bodyText).data.score)
-            var data = JSON.parse(res.bodyText).data;
-            $self.resData = data;
-            if(JSON.parse(res.bodyText).msg == '不是圆'){
-                ctx.clearRect(0,0,$self.canvasWidth,$self.canvasHeight);
+        
+        //判断是否是圆（以圆心为中点建立坐标轴，判断四个象限是否有点）
+        if(one + two + three + four < 4){
+            ctx.clearRect(0,0,$self.canvasWidth,$self.canvasHeight);
                 ctx.beginPath();
                 ctx.arc(cBeginX, cBeginY, cR, 0, Math.PI * 2, true);
                 ctx.strokeStyle = 'red';
@@ -177,26 +181,68 @@ export default {
                 lock = true;
                 $self.isCircle = true;
                 
-            }else{
-                // window.location.href = '/score' + location.search + '&res_id=' + data.res_id + '&score=' + data.score + '&sum=' + data.sum + '&sumLevel=' + data.sum_level;
-                // $self.$router.push({path:'/score', params:{score:data.score}})
-                // $self.score=data.score;
-                // $self.path = '/score?' +'s=' + data.score 
-                // $self.$router.push({path:'/score', query:{score:data.score,res_id:data.res_id,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}})
-                // doCookie('set','score', 100)
-                // delCookie('score');
-                // document.cookie = 'score' + '=' + res.body.data.score;
-                // $self.$router.push({path:'/score'})
-                $self.obj = {score:data.score,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}
-                $self.finish = true;
+        }else{
+            //计算分数
+            match.calMatching(canvas)
+            console.log(match.canvasData.matching)
+            $this.score =match.canvasData.matching.toFixed(3)*1000;
+
+                //数据交互部分
+            var postData = $this.postData;
+            var obj = getUrl();
+            postData.coordinate = pointArr.join(',')
+            postData.time_len = oTime.toString();
+            //获取用户设备
+            navigator.userAgent ? postData.device = navigator.userAgent : undefined;
+            postData.referee = obj.referree ? obj.referree.toString() : '0';
+            postData.user_id = doCookie('get', 'user_id') ? doCookie('get', 'user_id') : '0';
+            obj.group ? (postData.group = obj.group.toString()) : postData.group = '0';
+            postData.cookie_id = doCookie('get', 'cookie_id');
+            postData.deviation = match.canvasData.matching.toFixed(5).toString();
+            postData.score = $this.score.toString();
+            console.log(postData)
+            var oJSON = JSON.stringify(postData)
+            console.log(oJSON)
+            $this.loading = true;
+            
+            getData('/gameMain','post',oJSON).then((res) => {
+                console.log(res.bodyText)
+                $this.loading = false;
+                // alert(JSON.parse(res.bodyText).data.score)
+                var data = JSON.parse(res.bodyText).data;
+                $self.resData = data;
+                if(JSON.parse(res.bodyText).msg == '不是圆'){
+                    // ctx.clearRect(0,0,$self.canvasWidth,$self.canvasHeight);
+                    // ctx.beginPath();
+                    // ctx.arc(cBeginX, cBeginY, cR, 0, Math.PI * 2, true);
+                    // ctx.strokeStyle = 'red';
+                    // ctx.lineWidth = 20
+                    // ctx.stroke();
+                    // lock = true;
+                    // $self.isCircle = true;
+                    
+                }else{
+                    // window.location.href = '/score' + location.search + '&res_id=' + data.res_id + '&score=' + data.score + '&sum=' + data.sum + '&sumLevel=' + data.sum_level;
+                    // $self.$router.push({path:'/score', params:{score:data.score}})
+                    // $self.score=data.score;
+                    // $self.path = '/score?' +'s=' + data.score 
+                    // $self.$router.push({path:'/score', query:{score:data.score,res_id:data.res_id,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}})
+                    // doCookie('set','score', 100)
+                    // delCookie('score');
+                    // document.cookie = 'score' + '=' + res.body.data.score;
+                    // $self.$router.push({path:'/score'})
+                    $self.obj = {score:$self.score,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}
+                    $self.finish = true;
+                
 
 
-
-            }
-            // store.commit('setScore', JSON.parse(res.bodyText).data.score)
-        },()=>{
-            $self.warn = '网络貌似不通呢+_+'
-        })
+                }
+                // store.commit('setScore', JSON.parse(res.bodyText).data.score)
+            },()=>{
+                $self.warn = '网络貌似不通呢+_+'
+            })
+        }
+       
 
     }
 
@@ -221,7 +267,7 @@ export default {
         }
        
     }
-   
+    
   },
   methods:{
     reload(){

@@ -3,7 +3,7 @@
   <div class="score">
     <div class="header">
       <router-link tag="button" :to="{path:username ? '/' : '/signIn'}" class="sign-in">{{username?'主页':'登录'}}</router-link>
-      <button @click="share">分享</button>
+      <button id="shareBtn" @click="share">分享</button>
     </div>
     <div class="score-wrapper">
       <h1>{{username ? username :''}}</h1>
@@ -25,7 +25,7 @@
       <div class="footer">
         <router-link tag="button" :to="{path:username ? '/mine':'/signUp',query:{resId:this.$route.query.resId}}">{{username ? '空间' : '注册'}}</router-link>
         <router-link tag="button" to="/game?none=1">{{username ? '再来一局' : '再看看'}}</router-link>
-
+        <input type="text" :value="shareText" style="opacity:0;position:absolute">
       </div>
     </div>
    
@@ -36,7 +36,6 @@
 <script>
 import store from '@/store/vuex'
 import doCookie from '@/server/docookie'
-import qqShare from '@/server/qqShare'
 export default {
   name: 'app',
   data:function () {
@@ -48,7 +47,8 @@ export default {
       group:0,
       groupLevel:0,
       username:doCookie('get', 'username'),
-      link : ''
+      link : '',
+      shareText:''
     }
   },
   mounted:function (){
@@ -70,6 +70,10 @@ export default {
   methods:{
     share(){
       // window.location = this.link
+      var input = document.querySelectorAll('input')[0];
+      input.focus();
+      input.select();
+      document.execCommand("Copy")
     }
   }
   
