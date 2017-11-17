@@ -73,11 +73,26 @@ export default {
     ctx.beginPath();
     ctx.arc(cBeginX, cBeginY, cR, 0, Math.PI * 2, true);
     ctx.strokeStyle = 'red';
+    ctx.lineWidth = 20;
+    ctx.stroke();
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.arc(cBeginX, cBeginY, cR+20, 0, Math.PI * 2, true);
+    ctx.strokeStyle = 'rgba(254,254,254,255)';
     ctx.lineWidth = 20
     ctx.stroke();
-    match.calMatching(canvas);
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.arc(cBeginX, cBeginY, cR-20, 0, Math.PI * 2, true);
+    ctx.strokeStyle = 'rgba(254,254,254,255)';
+    ctx.lineWidth = 20
+    ctx.stroke();
+    ctx.closePath();
     match.canvasData.draw.rgba=[0,128,0,255]
-    // ctx.fillStyle="green";
+    match.canvasData.original.rgba=[255,0,0,255]
+    match.canvasData.original.rgba1=[254,254,254,255]
+    match.calMatching(canvas);
+    // ctx.fillStyle="rgb(254,254,254)";
     // ctx.fillRect(0,0,600,800);
     // console.log(ctx.getImageData(0,0,600,800))
     var touchdown = 'ontouchstart' in document ? 'touchstart' : 'mousedown';

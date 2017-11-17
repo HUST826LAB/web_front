@@ -101,7 +101,7 @@ export default {
     },
     check(){
       var uname = this.uname;
-      var reg = /[a-zA-Z0-9]/g;
+      var reg = /^[0-9a-zA-Z]+$/;
       var check = reg.test(uname);
       if(check){
         getData('/checkUsername?username=' + uname,'get').then((res)=>{

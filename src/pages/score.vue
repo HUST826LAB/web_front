@@ -25,7 +25,7 @@
       <div class="footer">
         <router-link tag="button" :to="{path:username ? '/mine':'/signUp',query:{resId:this.$route.query.resId}}">{{username ? '空间' : '注册'}}</router-link>
         <router-link tag="button" to="/game?none=1">{{username ? '再来一局' : '再看看'}}</router-link>
-        <input type="text" :value="shareText" style="opacity:0;position:absolute">
+        <input type="text" :value="shareText" style="opacity:0;position:absolute;top:-10000px;">
       </div>
     </div>
    
