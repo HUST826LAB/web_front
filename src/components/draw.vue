@@ -246,7 +246,7 @@ export default {
                     // delCookie('score');
                     // document.cookie = 'score' + '=' + res.body.data.score;
                     // $self.$router.push({path:'/score'})
-                    $self.obj = {score:$self.score,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}
+                    $self.obj = {score:$self.score,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id,group:$self.postData.group}
                     $self.finish = true;
                 
 

@@ -25,10 +25,16 @@
       <div class="footer">
         <router-link tag="button" :to="{path:username ? '/mine':'/signUp',query:{resId:this.$route.query.resId}}">{{username ? '空间' : '注册'}}</router-link>
         <router-link tag="button" to="/game?none=1">{{username ? '再来一局' : '再看看'}}</router-link>
-        <input type="text" :value="shareText" style="opacity:0;position:absolute;top:-10000px;">
+        
       </div>
     </div>
-   
+   <transition name="fade">
+        <div class="drump" v-show="loading">
+                <input id="share" type="text" :value="shareText">
+                <span>已复制到剪切板，粘贴分享给好友吧</span>
+                <button @click="ok">好的</button>
+        </div>
+    </transition>
   </div>
   
 </template>
@@ -47,8 +53,11 @@ export default {
       group:0,
       groupLevel:0,
       username:doCookie('get', 'username'),
+      userId:doCookie('get','userId'),
       link : '',
-      shareText:''
+      shareText:'zhchy.info/?referee=0' +'&group=' + this.$route.query.group,
+      loading:false,
+      count:0
     }
   },
   mounted:function (){
@@ -59,6 +68,10 @@ export default {
     this.gold = this.$route.query.gold;
     this.group = this.$route.query.group;
     this.groupLevel = this.$route.query.groupLevel;
+     document.querySelectorAll('#share')[0].addEventListener('Copy',function () {
+        console.log('a')
+        
+      })
    
   },
   ready:function() {
@@ -70,10 +83,17 @@ export default {
   methods:{
     share(){
       // window.location = this.link
-      var input = document.querySelectorAll('input')[0];
+      this.loading=true
+      
+       
+    },
+    ok(){
+      var $self = this;   
+      var input = document.querySelectorAll('#share')[0];
       input.focus();
       input.select();
-      document.execCommand("Copy")
+      if(document.execCommand("copy",false))
+        $self.loading=false
     }
   }
   
@@ -149,6 +169,32 @@ export default {
   .res{
     width:2.3333333333333335rem;
   }
+  .drump{
+      position :absolute;
+      width: 2.6666666666666665rem;
+      height:1.6666666666666667rem;
+      border:3px solid #000;
+      background: #fff;
+      top:0;
+      left:0;
+      bottom:0;
+      right:0;
+      margin:auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      border-radius: 40px;
+  }
+  .drump button{
+      width:1.3333333333333333rem;
+      height:0.3333333333333333rem;
+      border:3px solid #000;
+      background:#fff;
+      font-size:0.16666666666666666rem;
+      line-height: 0.3333333333333333rem;
+
+  }
   .footer{
     width:3rem;
     display: flex;
@@ -171,4 +217,27 @@ export default {
     color:red;
     font-weight: bolder;
   }
+    /* 开始过渡阶段,动画出去阶段 */
+.fade-enter-active,.fade-leave-active{
+  transition: all 0.5s ease-out;
+}
+/* 进入开始 */
+.fade-enter{
+  transform: translatey(-0.6666666666666666rem);
+  opacity: 0;
+}
+/* 出去终点 */
+.fade-leave-active{
+  transform: translateY(0.6666666666666666rem);
+  opacity: 0;
+}
+.go-score{
+    width: 2.6666666666666665rem;
+    height:0.56666666666666666rem;
+    border:3px solid #000;
+    background:#fff;
+    font-size:0.2rem;
+    line-height:0.26666666666666666rem;
+    border-radius: 30px;
+}
 </style>
