@@ -20,6 +20,8 @@ const draw = () =>
   import ('@/components/draw')
 const triangle = () =>
   import ('@/components/draw-triangle')
+const choose = () =>
+  import ('@/pages/choose')
 
 Vue.use(Router)
 export default new Router({
@@ -55,6 +57,10 @@ export default new Router({
     {
       path: '/mine',
       component: mine
+    },
+    {
+      path: '/choose',
+      component: choose
     }
   ]
 })

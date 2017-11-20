@@ -70,12 +70,15 @@ export default {
     this.postData.circle_x = cBeginX.toString();
     this.postData.circle_y = cBeginY.toString();
     this.postData.circle_r = cR.toString();
+    //添加基准区域
+    //满分区域
     ctx.beginPath();
     ctx.arc(cBeginX, cBeginY, cR, 0, Math.PI * 2, true);
     ctx.strokeStyle = 'red';
     ctx.lineWidth = 20;
     ctx.stroke();
     ctx.closePath();
+    //半分区域
     ctx.beginPath();
     ctx.arc(cBeginX, cBeginY, cR+20, 0, Math.PI * 2, true);
     ctx.strokeStyle = 'rgba(254,254,254,255)';
@@ -88,6 +91,7 @@ export default {
     ctx.lineWidth = 20
     ctx.stroke();
     ctx.closePath();
+    //分数判断初始化
     match.canvasData.draw.rgba=[0,128,0,255]
     match.canvasData.original.rgba=[255,0,0,255]
     match.canvasData.original.rgba1=[254,254,254,255]
@@ -188,11 +192,30 @@ export default {
         //判断是否是圆（以圆心为中点建立坐标轴，判断四个象限是否有点）
         if(one + two + three + four < 4){
             ctx.clearRect(0,0,$self.canvasWidth,$self.canvasHeight);
-                ctx.beginPath();
+               ctx.beginPath();
                 ctx.arc(cBeginX, cBeginY, cR, 0, Math.PI * 2, true);
                 ctx.strokeStyle = 'red';
+                ctx.lineWidth = 20;
+                ctx.stroke();
+                ctx.closePath();
+                //半分区域
+                ctx.beginPath();
+                ctx.arc(cBeginX, cBeginY, cR+20, 0, Math.PI * 2, true);
+                ctx.strokeStyle = 'rgba(254,254,254,255)';
                 ctx.lineWidth = 20
                 ctx.stroke();
+                ctx.closePath();
+                ctx.beginPath();
+                ctx.arc(cBeginX, cBeginY, cR-20, 0, Math.PI * 2, true);
+                ctx.strokeStyle = 'rgba(254,254,254,255)';
+                ctx.lineWidth = 20
+                ctx.stroke();
+                ctx.closePath();
+
+                one = false;
+                two = false;
+                three = false;
+                four = false;
                 lock = true;
                 $self.isCircle = true;
                 

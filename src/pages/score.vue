@@ -13,7 +13,7 @@
       <div class="score1">
         <span>分数:</span><span>{{score}}</span>
       </div>
-      <div class="group" v-show="group">
+      <div class="group" v-show="groupLevel">
         <span>组内排名:</span><span>{{groupLevel}}/{{group}}</span>
       </div>
       <div class="sum">
@@ -24,14 +24,14 @@
        <img class="res" src="../assets/res.jpg" alt="">
       <div class="footer">
         <router-link tag="button" :to="{path:username ? '/mine':'/signUp',query:{resId:this.$route.query.resId}}">{{username ? '空间' : '注册'}}</router-link>
-        <router-link tag="button" to="/game?none=1">{{username ? '再来一局' : '再看看'}}</router-link>
+        <router-link tag="button" :to="userId ? 'choose' :'game?none=1'">{{username ? '再来一局' : '再看看'}}</router-link>
         
       </div>
     </div>
    <transition name="fade">
         <div class="drump" v-show="loading">
                 <input id="share" type="text" :value="shareText">
-                <span>已复制到剪切板，粘贴分享给好友吧</span>
+                <span>复制上面的连接，粘贴分享给好友吧</span>
                 <button @click="ok">好的</button>
         </div>
     </transition>
@@ -53,7 +53,7 @@ export default {
       group:0,
       groupLevel:0,
       username:doCookie('get', 'username'),
-      userId:doCookie('get','userId'),
+      userId:doCookie('get','user_id'),
       link : '',
       shareText:'zhchy.info/?referee=0' +'&group=' + this.$route.query.group,
       loading:false,
@@ -68,10 +68,7 @@ export default {
     this.gold = this.$route.query.gold;
     this.group = this.$route.query.group;
     this.groupLevel = this.$route.query.groupLevel;
-     document.querySelectorAll('#share')[0].addEventListener('Copy',function () {
-        console.log('a')
-        
-      })
+    
    
   },
   ready:function() {
@@ -89,11 +86,11 @@ export default {
     },
     ok(){
       var $self = this;   
-      var input = document.querySelectorAll('#share')[0];
-      input.focus();
-      input.select();
-      if(document.execCommand("copy",false))
-        $self.loading=false
+      // var input = document.querySelectorAll('#share')[0];
+      // input.focus();
+      // input.select();
+      // if(document.execCommand("copy",false))
+      $self.loading=false
     }
   }
   
@@ -185,6 +182,9 @@ export default {
       justify-content: space-around;
       align-items: center;
       border-radius: 40px;
+  }
+  .drump span{
+    width:1.875rem;
   }
   .drump button{
       width:1.3333333333333333rem;

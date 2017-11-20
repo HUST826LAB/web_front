@@ -8,7 +8,7 @@
     <transition name="fade">
         <div class="drump" v-show="isCircle">
             <div>
-                <span>貌似画的不是圆呢</span>
+                <span>貌似画的不是三角呢</span>
                 <br>
                 <span>重新画一个吧n(*≧▽≦*)n</span>
             </div>
@@ -28,11 +28,11 @@
 import store from '@/store/vuex'
 import getData from '@/server/vue-resource'
 import doCookie from '@/server/docookie'
+import match from '@/server/calMatching'
 export default {
   name: 'draw',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App',
       canvasWidth: 250,
       canvasHeight: 250,
       postData: {},
@@ -43,7 +43,11 @@ export default {
       loading:false,
       warn:'玩命加载中...',
       obj:{},
-      finish:false
+      finish:false,
+      score:0,
+      lock1:false,
+      lock2:false,
+      lock3:false
     }
   },
   created:function () {
@@ -71,7 +75,12 @@ export default {
     var pointArr = [];
     this.canvas = ctx;
     var summitArr = [oneX,oneY,twoX,twoY,threeX,threeY]
+    var one = false;
+    var two = false;
+    var three = false;
+    var four = false;
     this.postData.summit = summitArr.join(','); 
+    //基准图形
     ctx.beginPath();
     ctx.moveTo(oneX,oneY)
     ctx.lineTo(twoX,twoY)
@@ -80,6 +89,28 @@ export default {
     ctx.strokeStyle = 'red';
     ctx.lineWidth = 20
     ctx.stroke();
+    //半分图形
+    ctx.beginPath();
+    ctx.moveTo(oneX,oneY+40)
+    ctx.lineTo(twoX+35,twoY-20)
+    ctx.lineTo(threeX-35,threeY-20)
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(254,254,254,255)';
+    ctx.lineWidth = 20
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(oneX,oneY-40)
+    ctx.lineTo(twoX-35,twoY+20)
+    ctx.lineTo(threeX+35,threeY+20)
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(254,254,254,255)';
+    ctx.lineWidth = 20
+    ctx.stroke();
+     match.canvasData.draw.rgba=[0,128,0,255]
+    match.canvasData.original.rgba=[255,0,0,255]
+    match.canvasData.original.rgba1=[254,254,254,255]
+    match.calMatching(canvas);
     var touchdown = 'ontouchstart' in document ? 'touchstart' : 'mousedown';
     var touchmove = 'ontouchmove' in document ? 'touchmove' : 'mousemove';
     var touchend = 'ontouchend' in document ? 'touchend' : 'mouseup';
@@ -88,6 +119,8 @@ export default {
     var oy = null;
     var oTime = null;
     var $this = this;
+    var cBeginX = oneX;
+    var cBeginY = twoY - oneY;
         var addHandler = function (element, type, handler) {
         if (element.addEventListener) {
             element.addEventListener(type, handler, false);
@@ -144,6 +177,18 @@ export default {
         oy = y;
         oData = oData + x.toString() + ',' + y.toString() + ',';
         event.preventDefault();
+        if(x > cBeginX && y < cBeginY) {
+            one = true;
+        }
+        if(x > cBeginX && y > cBeginY){
+            two = true;
+        }
+        if(x < cBeginX && y > cBeginY){
+            three = true;
+        }
+        if(x < cBeginX && y < cBeginY){
+            four = true;
+        }
     }
     //抬起请求数据
     function up(e) {
@@ -152,57 +197,103 @@ export default {
         var ev = 'ontouchstart' in document ? e.touches[0] : e;
         oTime = new Date().getTime() - oTime;
         removeEvent(document, touchend, up)
-        //数据交互部分
-        var postData = $this.postData;
-        var obj = getUrl();
-        postData.coordinate = pointArr.join(',')
-        postData.time_len = oTime.toString();
-        //获取用户设备
-        navigator.userAgent ? postData.device = navigator.userAgent : undefined;
-        postData.referee = obj.referree ? obj.referree.toString() : '0';
-        postData.user_id = doCookie('get', 'user_id') ? doCookie('get', 'user_id') : '0';
-        obj.group ? (postData.group = obj.group.toString()) : postData.group = '0';
-        postData.cookie_id = doCookie('get', 'cookie_id');
-        console.log(postData)
-        var oJSON = JSON.stringify(postData)
-        console.log(oJSON)
-        $this.loading = true;
-        getData('/gameMain','post',oJSON).then((res) => {
-            console.log(res.bodyText)
-            $this.loading = false;
-            // alert(JSON.parse(res.bodyText).data.score)
-            var data = JSON.parse(res.bodyText).data;
-            $self.resData = data;
-            if(JSON.parse(res.bodyText).msg == '不是圆'){
-                ctx.clearRect(0,0,$self.canvasWidth,$self.canvasHeight);
+         if(one + two + three + four < 4){
+            ctx.clearRect(0,0,$self.canvasWidth,$self.canvasHeight);
+                //基准图形
                 ctx.beginPath();
-                ctx.arc(cBeginX, cBeginY, cR, 0, Math.PI * 2, true);
+                ctx.moveTo(oneX,oneY)
+                ctx.lineTo(twoX,twoY)
+                ctx.lineTo(threeX,threeY)
+                ctx.closePath();
                 ctx.strokeStyle = 'red';
                 ctx.lineWidth = 20
                 ctx.stroke();
+                //半分图形
+                ctx.beginPath();
+                ctx.moveTo(oneX,oneY+40)
+                ctx.lineTo(twoX+35,twoY-20)
+                ctx.lineTo(threeX-35,threeY-20)
+                ctx.closePath();
+                ctx.strokeStyle = 'rgba(254,254,254,255)';
+                ctx.lineWidth = 20
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(oneX,oneY-40)
+                ctx.lineTo(twoX-35,twoY+20)
+                ctx.lineTo(threeX+35,threeY+20)
+                ctx.closePath();
+                ctx.strokeStyle = 'rgba(254,254,254,255)';
+                ctx.lineWidth = 20
+                ctx.stroke();
+                one = false;
+                two = false;
+                three = false;
+                four = false;
                 lock = true;
                 $self.isCircle = true;
                 
-            }else{
-                // window.location.href = '/score' + location.search + '&res_id=' + data.res_id + '&score=' + data.score + '&sum=' + data.sum + '&sumLevel=' + data.sum_level;
-                // $self.$router.push({path:'/score', params:{score:data.score}})
-                // $self.score=data.score;
-                // $self.path = '/score?' +'s=' + data.score 
-                // $self.$router.push({path:'/score', query:{score:data.score,res_id:data.res_id,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}})
-                // doCookie('set','score', 100)
-                // delCookie('score');
-                // document.cookie = 'score' + '=' + res.body.data.score;
-                // $self.$router.push({path:'/score'})
-                $self.obj = {score:data.score,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}
-                $self.finish = true;
+        }else{
+            //计算分数
+            match.calMatching(canvas)
+            console.log(match.canvasData.matching)
+            $this.score =match.canvasData.matching.toFixed(3)*1000;
+
+                //数据交互部分
+            var postData = $this.postData;
+            var obj = getUrl();
+            postData.coordinate = pointArr.join(',')
+            postData.time_len = oTime.toString();
+            //获取用户设备
+            navigator.userAgent ? postData.device = navigator.userAgent : undefined;
+            postData.referee = obj.referree ? obj.referree.toString() : '0';
+            postData.user_id = doCookie('get', 'user_id') ? doCookie('get', 'user_id') : '0';
+            obj.group ? (postData.group = obj.group.toString()) : postData.group = '0';
+            postData.cookie_id = doCookie('get', 'cookie_id');
+            postData.deviation = match.canvasData.matching.toFixed(5).toString();
+            postData.score = $this.score.toString();
+            console.log(postData)
+            var oJSON = JSON.stringify(postData)
+            console.log(oJSON)
+            $this.loading = true;
+            
+            getData('/gameMain','post',oJSON).then((res) => {
+                console.log(res.bodyText)
+                $this.loading = false;
+                // alert(JSON.parse(res.bodyText).data.score)
+                var data = JSON.parse(res.bodyText).data;
+                $self.resData = data;
+                if(JSON.parse(res.bodyText).msg == '不是圆'){
+                    // ctx.clearRect(0,0,$self.canvasWidth,$self.canvasHeight);
+                    // ctx.beginPath();
+                    // ctx.arc(cBeginX, cBeginY, cR, 0, Math.PI * 2, true);
+                    // ctx.strokeStyle = 'red';
+                    // ctx.lineWidth = 20
+                    // ctx.stroke();
+                    // lock = true;
+                    // $self.isCircle = true;
+                    
+                }else{
+                    // window.location.href = '/score' + location.search + '&res_id=' + data.res_id + '&score=' + data.score + '&sum=' + data.sum + '&sumLevel=' + data.sum_level;
+                    // $self.$router.push({path:'/score', params:{score:data.score}})
+                    // $self.score=data.score;
+                    // $self.path = '/score?' +'s=' + data.score 
+                    // $self.$router.push({path:'/score', query:{score:data.score,res_id:data.res_id,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id}})
+                    // doCookie('set','score', 100)
+                    // delCookie('score');
+                    // document.cookie = 'score' + '=' + res.body.data.score;
+                    // $self.$router.push({path:'/score'})
+                    $self.obj = {score:$self.score,sum:data.sum,sumLevel:data.sum_level,gold:data.gold,group:data.sumGroup,groupLevel:data.group_level,resId:data.res_id,group:$self.postData.group}
+                    $self.finish = true;
+                
 
 
-
-            }
-            // store.commit('setScore', JSON.parse(res.bodyText).data.score)
-        },()=>{
-            $self.warn = '网络貌似不通呢+_+'
-        })
+                }
+                // store.commit('setScore', JSON.parse(res.bodyText).data.score)
+            },()=>{
+                $self.warn = '网络貌似不通呢+_+'
+            })
+        }
 
     }
 
