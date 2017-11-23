@@ -94,7 +94,7 @@ export default {
     flex-wrap: nowrap;
     max-width: 1rem;
   }
-  ul:first-child li span:nth-child(2){
+  ul li span:nth-child(2){
     width:1rem;
     height: .4rem;
     white-space: nowrap;
