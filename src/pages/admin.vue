@@ -28,6 +28,7 @@
                 <td>{{item.numSum}}</td>
                 <td>{{item.score}}</td>
                 <td>{{item.create_time}}</td>
+                <td class="del" @click="del">删除</td>
               </tr>
           </table>
           <div class="pages">
@@ -78,7 +79,8 @@ export default {
       nowPage:0,
       arr :[],
       sum:0,
-      showNum:10
+      showNum:10,
+      ID:''
     }
   },
   mounted:function () {
@@ -116,11 +118,13 @@ export default {
       }
       console.log(obj)
       getData('/newGroup','post',JSON.stringify(obj) ).then((res)=>{
-        console.log(res.body)
+        var data = res.body.data;
         if(res.body.code === 0){
           // var qr = qrcode();
           alert('创建成功')
           $this.qrcode = true;
+          console.log(data)
+          $this.ID = data;
           var qr = qrcode()
           var qrCode = new qr('qrcode', { 
             text: 'your content', 
@@ -129,9 +133,13 @@ export default {
             colorDark : '#000000', 
             colorLight : '#ffffff', 
           });
-          qrCode.makeCode('http://zhchy.info'+'?group='+this.group);
+          qrCode.makeCode('http://zhchy.info'+'?group='+this.ID);
           // qrcode(document.getElementById('qrcode'), 'http://zhchy.info'+'?group='+this.group)
-        }else if(res.body.code === 1) {
+          getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum}).then((res)=>{
+            var data = res.body.data;
+            $this.list = data.group_lst;
+          })
+        }else if(res.body.code === -2) {
           $this.qrcode = true;
           var qr = qrcode()
           var qrCode = new qr('qrcode', { 
@@ -141,7 +149,7 @@ export default {
             colorDark : '#000000', 
             colorLight : '#ffffff', 
           });
-          qrCode.makeCode('http://zhchy.info'+'?group='+this.group);
+          qrCode.makeCode('http://zhchy.info'+'?group='+res.body.data);
         }
       })
     },
@@ -151,7 +159,6 @@ export default {
     },
     changePage(e){
       var $this = this;
-      console.log(e.target)
       var num = e.target.innerHTML -1;
       this.nowPage = num;
       var arr = this.arr
@@ -241,7 +248,21 @@ export default {
         var data = res.body.data;
         $this.list = data.group_lst;
       })
-  }
+   },
+   del(e){
+     var $this = this;
+     var name = e.target.parentNode.children[0].innerHTML;
+     var sure = confirm('是否删除'+name+'?')
+     if(sure){
+       getData('/deleteGroup','post',{"name": name,}).then(()=>{
+         getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum}).then((res)=>{
+          var data = res.body.data;
+          $this.list = data.group_lst;
+        })
+       })
+     }
+     
+   }
   },
  
   
@@ -329,6 +350,12 @@ export default {
   .group-list table td{
     border:1px solid #000;
     padding:5px;
+  }
+  .group-list table td.del{
+    background:red;
+    cursor: pointer;
+    color:#fff;
+    margin-left:10px;
   }
 
 
