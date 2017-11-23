@@ -35,7 +35,7 @@
               <li @click="top" v-show="nowPage>2">首页</li>
               <li @click="up" v-show="nowPage >0">上一页</li>
               <li @click="changePage" v-for="num in pages" :class="{active : num == nowPage}">{{num+1}}</li>
-              <li @click="down" v-show="nowPage<sum">下一页</li>
+              <li @click="down" v-show="nowPage<sum-1">下一页</li>
               <li @click="bottom" v-show="sum-nowPage >3">尾页</li>
             </ul>
           </div>
@@ -77,7 +77,8 @@ export default {
       list:[],
       nowPage:0,
       arr :[],
-      sum:0
+      sum:0,
+      showNum:10
     }
   },
   mounted:function () {
@@ -87,7 +88,7 @@ export default {
       this.admin = true;
     }
     getData('/selectGroup','post',{ "current": "0",
-    "pageLen": "5"}).then((res)=>{
+    "pageLen": $this.showNum}).then((res)=>{
       console.log(res.body.data)
       var data = res.body.data;
       var arr = $this.arr;
@@ -96,6 +97,7 @@ export default {
       }
       this.pages = arr.slice(0,5)
       $this.list = data.group_lst;
+      $this.sum = data.sum
     })
   },
   methods:{
@@ -114,6 +116,7 @@ export default {
       }
       console.log(obj)
       getData('/newGroup','post',JSON.stringify(obj) ).then((res)=>{
+        console.log(res.body)
         if(res.body.code === 0){
           // var qr = qrcode();
           alert('创建成功')
@@ -128,6 +131,17 @@ export default {
           });
           qrCode.makeCode('http://zhchy.info'+'?group='+this.group);
           // qrcode(document.getElementById('qrcode'), 'http://zhchy.info'+'?group='+this.group)
+        }else if(res.body.code === 1) {
+          $this.qrcode = true;
+          var qr = qrcode()
+          var qrCode = new qr('qrcode', { 
+            text: 'your content', 
+            width: 512, 
+            height: 512, 
+            colorDark : '#000000', 
+            colorLight : '#ffffff', 
+          });
+          qrCode.makeCode('http://zhchy.info'+'?group='+this.group);
         }
       })
     },
@@ -149,7 +163,7 @@ export default {
       }else{
         this.pages = arr.slice(num -2,num+3)
       }
-      getData('/selectGroup','post',{"current": num,"pageLen": "5"}).then((res)=>{
+      getData('/selectGroup','post',{"current": num,"pageLen": $this.showNum}).then((res)=>{
         var data = res.body.data;
         $this.list = data.group_lst;
       })
@@ -167,7 +181,7 @@ export default {
       }else{
         this.pages = arr.slice(num -2,num+3)
       }
-      getData('/selectGroup','post',{"current": num,"pageLen": "5"}).then((res)=>{
+      getData('/selectGroup','post',{"current": num,"pageLen": $this.showNum}).then((res)=>{
         var data = res.body.data;
         $this.list = data.group_lst;
         $this.sum = data.sum
@@ -186,7 +200,7 @@ export default {
       }else{
         this.pages = arr.slice(num -2,num+3)
       }
-      getData('/selectGroup','post',{"current": num,"pageLen": "5"}).then((res)=>{
+      getData('/selectGroup','post',{"current": num,"pageLen": $this.showNum}).then((res)=>{
         var data = res.body.data;
         console.log(res)
         $this.list = data.group_lst;
@@ -205,7 +219,7 @@ export default {
       }else{
         this.pages = arr.slice(num -2,num+3)
       }
-      getData('/selectGroup','post',{"current": num,"pageLen": "5"}).then((res)=>{
+      getData('/selectGroup','post',{"current": num,"pageLen": $this.showNum}).then((res)=>{
         var data = res.body.data;
         $this.list = data.group_lst;
       })
@@ -223,7 +237,7 @@ export default {
       }else{
         this.pages = arr.slice(num -2,num+3)
       }
-      getData('/selectGroup','post',{"current": num,"pageLen": "5"}).then((res)=>{
+      getData('/selectGroup','post',{"current": num,"pageLen": $this.showNum}).then((res)=>{
         var data = res.body.data;
         $this.list = data.group_lst;
       })
