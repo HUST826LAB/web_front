@@ -72,7 +72,7 @@ export default {
               $self.alert = true;
               $self.warn = '注册成功'
               setTimeout(function () {
-                $self.$router.push({path:'/game?none=1'})
+                $self.$router.push({path:'/choose'})
               },1000)
             }else{
               $self.alert = true;
