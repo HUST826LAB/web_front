@@ -3,7 +3,6 @@
       <ul>
         个人排行榜
       <li v-for="(score,index) in score">
-        <span>{{index + 1}}.</span>
         <span>{{score.uname ? score.uname:score.username}}</span>
         <span>{{score.score}}</span>
       </li>
@@ -11,9 +10,8 @@
       <ul>
         团体排行榜
       <li v-for="(group,index) in group">
-        <span>{{index + 1}}.</span>
         <span>{{group.name}}</span>
-        <span>{{group.score >= 100000 ? group.score / 10000+'万' : group.score}}</span>
+        <span>{{group.score >= 1000 ? (group.score/1000).toFixed(2)+'K':group.score}}</span>
       </li>
     </ul>
     
@@ -60,11 +58,11 @@ export default {
 <style scoped>
   .my-list{
     display: flex;
-    justify-content: space-between;
-    width:2.8rem;
+    justify-content: space-around;
+    width:100%;
   }
   ul{
-    width:1rem;
+    width:1.4rem;
     height:1.6666666666666667rem;
     border:0.006666666666666667rem solid #000;
     overflow: hidden;
@@ -92,9 +90,9 @@ export default {
     display: flex;
     justify-content: space-between;
     flex-wrap: nowrap;
-    max-width: 1rem;
+    max-width: 1.4rem;
   }
-  ul li span:nth-child(2){
+  ul li span:nth-child(1){
     width:1rem;
     height: .4rem;
     white-space: nowrap;

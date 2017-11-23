@@ -4,7 +4,7 @@
     <div class="online-num">参与人数{{data.resCount}}</div>
     <my-list :oData="data"></my-list>
     <div class="middle">
-      <img src="../assets/index-middle.jpg" alt="">
+      <img src="../assets/logo.jpg" alt="">
       <router-link :to="{path:userId?'choose':'game?none=1' , query:{group:group,refree:refree}}"  class="start" tag="button" id="J_weixin">play</router-link >
     </div>
    <!-- <div id="weixin-tip"><p><img src="" alt="微信打开"/><span id="close" title="关闭" class="close">×</span></p></div> -->
@@ -111,16 +111,16 @@ export default {
   font-size:0.16666666666666666rem;
 }
 .my-list{
-    width:2.8rem;
+    /* width:2.8rem; */
     margin-bottom: auto;
     margin-top:0.06666666666666667rem
 }
 .middle{
   margin-bottom:auto;
-  width:1.4333333333333333rem;
+  width:2.4333333333333333rem;
 }
 .middle img{
-  width: 1.4333333333333333rem;
+  width: 2.4333333333333333rem;
 }
 .start{
   height: 0.5166666666666667rem;
@@ -130,7 +130,7 @@ export default {
   background:#fff;
   color:#000;
   border-radius: 50px;
-  margin-top:-0.16666666666666666rem;
+  /* margin-top:-0.16666666666666666rem; */
 }
 .start:focus{
   outline: 0;
