@@ -107,7 +107,7 @@ export default {
       if(this.username=='admin' && this.password=='admin'){
         this.login = false;
         this.admin = true;
-        doCookie('set','admin',username)
+        doCookie('set','admin',this.username)
       }
     },
     make(){
