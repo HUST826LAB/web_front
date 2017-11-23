@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="footer">
-        <router-link tag="button" :to="{path:'/game?none=1'}">游戏</router-link>
+        <router-link tag="button" :to="{path:'/game?none=1',query:{group:groupID}}">游戏</router-link>
         <button @click="signOut">退出登录</button>
       </div>
       
@@ -43,7 +43,8 @@ export default {
       gold:149,
       group:30,
       groupLevel:10,
-      groupName:'土豆'
+      groupName:'土豆',
+      groupID:''
     }
   },
   mounted:function (){
@@ -63,6 +64,11 @@ export default {
         $self.groupLevel = data.group_level;
         $self.groupName = data.group_name ? data.group_name : '暂无分组'
         $self.username = data.username;
+        if(data.group_name) {
+          getData('/selectGroup','post',{"user_id": "1","name": data.group_name,}).then((res)=>{
+            $self.gruopID = res.data.body
+          })
+        }
       }
     })
   },

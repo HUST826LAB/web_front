@@ -2,7 +2,7 @@
 <template>
   <div class="score">
     <div class="header">
-      <router-link tag="button" :to="{path:username ? '/' : '/signIn'}" class="sign-in">{{username?'主页':'登录'}}</router-link>
+      <router-link tag="button" :to="{path:username ? '/' : '/signIn',query:{group:group}}" class="sign-in">{{username?'主页':'登录'}}</router-link>
       <button id="shareBtn" @click="share">分享</button>
     </div>
     <div class="score-wrapper">

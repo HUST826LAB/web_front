@@ -56,7 +56,7 @@ export default {
             }else{
               doCookie('set','username',postData.username)
               doCookie('set', 'user_id', res.body.data.user_id)
-              $self.$router.push('/?mine')
+              $self.$router.push({path:'/mine',query:$self.$route.query})
             }
           }
         })

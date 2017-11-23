@@ -11,7 +11,7 @@
         团体排行榜
       <li v-for="(group,index) in group">
         <span>{{group.name}}</span>
-        <span>{{group.score >= 1000 ? (group.score/1000).toFixed(2)+'K':group.score}}</span>
+        <span>{{group.score >= 1000 ? (group.score/1000)+'K':group.score}}</span>
       </li>
     </ul>
     

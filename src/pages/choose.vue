@@ -21,10 +21,10 @@ export default {
   },
   methods:{
     easy(){
-      this.$router.push({path:'/game?none=1'})
+      this.$router.push({path:'/game?none=1',query:this.$route.query})
     },
     middle(){
-      this.$router.push({path:'/game/triangle?none=1'})
+      this.$router.push({path:'/game/triangle?none=1',query:this.$route.query})
     }
   }
   
