@@ -14,7 +14,7 @@
         <span>分数:</span><span>{{score}}</span>
       </div>
       <div class="group" v-show="groupLevel">
-        <span>组内排名:</span><span>{{groupLevel}}/{{group}}</span>
+        <span>组内排名:</span><span>{{groupLevel}}/{{sumGroup}}</span>
       </div>
       <div class="sum">
         <span>全体排名:</span><span>{{sumLevel}}/{{sum}}</span>
@@ -24,7 +24,7 @@
        <img class="res" src="../assets/res.jpg" alt="">
       <div class="footer">
         <router-link tag="button" :to="{path:username ? '/mine':'/signUp',query:{resId:this.$route.query.resId}}">{{username ? '空间' : '注册'}}</router-link>
-        <router-link tag="button" :to="userId ? 'choose' :'game?none=1'">{{username ? '再来一局' : '再看看'}}</router-link>
+        <router-link tag="button" :to="{path:userId ? 'choose' :'game?none=1',query:{group:group}}">{{username ? '再来一局' : '再看看'}}</router-link>
         
       </div>
     </div>
@@ -52,6 +52,7 @@ export default {
       gold:0,
       group:0,
       groupLevel:0,
+      sumGroup:0,
       username:doCookie('get', 'username'),
       userId:doCookie('get','user_id'),
       link : '',
@@ -66,6 +67,7 @@ export default {
     this.sum = this.$route.query.sum;
     this.sumLevel = this.$route.query.sumLevel;
     this.gold = this.$route.query.gold;
+    this.sumGroup = this.$route.query.sumGroup;
     this.group = this.$route.query.group;
     this.groupLevel = this.$route.query.groupLevel;
     

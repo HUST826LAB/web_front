@@ -5,7 +5,7 @@
     <my-list :oData="data"></my-list>
     <div class="middle">
       <img src="../assets/index-middle.jpg" alt="">
-      <router-link :to="userId ? 'choose' :'game?none=1'"  class="start" tag="button" id="J_weixin">play</router-link >
+      <router-link :to="{path:userId?'choose':'game?none=1' , query:{group:this.group,refree:this.refree}}"  class="start" tag="button" id="J_weixin">play</router-link >
     </div>
    <!-- <div id="weixin-tip"><p><img src="" alt="微信打开"/><span id="close" title="关闭" class="close">×</span></p></div> -->
 
@@ -25,7 +25,9 @@ export default {
       data:{},
       giveData:'',
       url:'?none=1',
-      userId:doCookie('get','user_id')
+      userId:doCookie('get','user_id'),
+      group:'',
+      refree:''
     }
   },
   components:{
@@ -41,6 +43,8 @@ export default {
       var obj = getUrl();
       store.commit('setReferee',obj['referee'])
       store.commit('setGroup',obj['group'])
+      this.group = obj.group;
+      this.refree = obj.refree;
     }
         getData('/index').then((res)=>{
         this.data = res.body.data
