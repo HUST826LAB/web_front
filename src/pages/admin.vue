@@ -23,7 +23,7 @@
               <th>组别总分</th>
               <th>创建时间</th>
             </tr>
-             <tr v-for="item in list">
+             <tr v-for="item in list" @click="routerTo">
                 <td>{{item.name}}</td>
                 <td>{{item.numSum}}</td>
                 <td>{{item.score}}</td>
@@ -74,7 +74,6 @@ export default {
       password:'',
       group:'',
       qrcode:false,
-      pages:[],
       list:[],
       nowPage:0,
       arr :[],
@@ -97,7 +96,6 @@ export default {
       for(let i = 0;i < data.sum;i++){
         arr.push(i)
       }
-      this.pages = arr.slice(0,5)
       $this.list = data.group_lst;
       $this.sum = data.sum
     })
@@ -116,15 +114,14 @@ export default {
         user_id : '1',
         name : this.group
       }
-      console.log(obj)
       getData('/newGroup','post',JSON.stringify(obj) ).then((res)=>{
         var data = res.body.data;
         if(res.body.code === 0){
-          // var qr = qrcode();
           alert('创建成功')
           $this.qrcode = true;
           console.log(data)
           $this.ID = data;
+          //二维码生成
           var qr = qrcode()
           var qrCode = new qr('qrcode', { 
             text: 'your content', 
@@ -134,7 +131,6 @@ export default {
             colorLight : '#ffffff', 
           });
           qrCode.makeCode('http://zhchy.info'+'?group='+this.ID);
-          // qrcode(document.getElementById('qrcode'), 'http://zhchy.info'+'?group='+this.group)
           getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum}).then((res)=>{
             var data = res.body.data;
             $this.list = data.group_lst;
@@ -152,121 +148,88 @@ export default {
           qrCode.makeCode('http://zhchy.info'+'?group='+res.body.data);
         }
       })
-    },
+      },
     close(){
       document.getElementById('qrcode').innerHTML=''
       this.qrcode=false
     },
+    //分页部分
     changePage(e){
-      var $this = this;
       var num = e.target.innerHTML -1;
       this.nowPage = num;
+      
+    },
+    top(){
+     var num = 0;
+    this.nowPage = num;
       var arr = this.arr
       var sum = arr.length;
-      if(num < 2){
-        this.pages = arr.slice(0,5)
-      }else if(num >= sum - 2 ){
-        this.pages = arr.slice(sum-5,sum)
-      }else{
-        this.pages = arr.slice(num -2,num+3)
+     
+    },
+    up(){
+      var num = this.nowPage - 1;
+      this.nowPage = num;
+    },
+    down(){
+      var num = this.nowPage + 1;
+      this.nowPage = num;
+    },
+    bottom(){
+      var num = this.sum-1;
+      this.nowPage = num;
+    },
+    del(e){
+      var $this = this;
+      var name = e.target.parentNode.children[0].innerHTML;
+      var sure = confirm('是否删除'+name+'?')
+      if(sure){
+        getData('/deleteGroup','post',{"name": name,}).then(()=>{
+          getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum}).then((res)=>{
+            var data = res.body.data;
+            $this.list = data.group_lst;
+          })
+        })
       }
-      getData('/selectGroup','post',{"current": num,"pageLen": $this.showNum}).then((res)=>{
+      
+    },
+    _list(){
+      var num = this.nowPage;
+      var $this = this;
+      getData('/selectGroup','post',{"current": num,"pageLen": this.showNum}).then((res)=>{
         var data = res.body.data;
         $this.list = data.group_lst;
       })
     },
-     top(){
-       var $this = this;
-    var num = 0;
-    this.nowPage = num;
-      var arr = this.arr
-      var sum = arr.length;
-      if(num < 2){
-        this.pages = arr.slice(0,5)
-      }else if(num >= sum - 2 ){
-        this.pages = arr.slice(sum-5,sum)
-      }else{
-        this.pages = arr.slice(num -2,num+3)
-      }
-      getData('/selectGroup','post',{"current": num,"pageLen": $this.showNum}).then((res)=>{
-        var data = res.body.data;
-        $this.list = data.group_lst;
-        $this.sum = data.sum
-      })
+    routerTo(e){
+      var groupName = e.target.parentNode.children[0].innerHTML;
+      this.$router.push({path:'/groupList',query:{groupName:groupName}})
+    }
   },
-  up(){
-    var $this = this;
-    var num = this.nowPage - 1;
-    this.nowPage = num;
-      var arr = this.arr
-      var sum = arr.length;
-      if(num < 2){
-        this.pages = arr.slice(0,5)
-      }else if(num >= sum - 2 ){
-        this.pages = arr.slice(sum-5,sum)
-      }else{
-        this.pages = arr.slice(num -2,num+3)
+    computed:{
+      pages:function () {
+        var num = this.nowPage;
+        var arr = this.arr
+        var sum = arr.length;
+        if(num < 2){
+          return arr.slice(0,5)
+        }else if(num >= sum - 2 ){
+          return arr.slice(sum-5,sum)
+        }else{
+          return arr.slice(num -2,num+3)
+        }
+        
+      },
+      
+    },
+    watch:{
+      nowPage:function () {
+        this._list()
       }
-      getData('/selectGroup','post',{"current": num,"pageLen": $this.showNum}).then((res)=>{
-        var data = res.body.data;
-        console.log(res)
-        $this.list = data.group_lst;
-      })
-  },
-  down(){
-    var $this = this;
-    var num = this.nowPage + 1;
-    this.nowPage = num;
-      var arr = this.arr
-      var sum = arr.length;
-      if(num < 2){
-        this.pages = arr.slice(0,5)
-      }else if(num >= sum - 2 ){
-        this.pages = arr.slice(sum-5,sum)
-      }else{
-        this.pages = arr.slice(num -2,num+3)
-      }
-      getData('/selectGroup','post',{"current": num,"pageLen": $this.showNum}).then((res)=>{
-        var data = res.body.data;
-        $this.list = data.group_lst;
-      })
-  },
-  bottom(){
-    var $this = this;
-    var num = this.sum-1;
-    this.nowPage = num;
-      var arr = this.arr
-      var sum = arr.length;
-      if(num < 2){
-        this.pages = arr.slice(0,5)
-      }else if(num >= sum - 2 ){
-        this.pages = arr.slice(sum-5,sum)
-      }else{
-        this.pages = arr.slice(num -2,num+3)
-      }
-      getData('/selectGroup','post',{"current": num,"pageLen": $this.showNum}).then((res)=>{
-        var data = res.body.data;
-        $this.list = data.group_lst;
-      })
-   },
-   del(e){
-     var $this = this;
-     var name = e.target.parentNode.children[0].innerHTML;
-     var sure = confirm('是否删除'+name+'?')
-     if(sure){
-       getData('/deleteGroup','post',{"name": name,}).then(()=>{
-         getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum}).then((res)=>{
-          var data = res.body.data;
-          $this.list = data.group_lst;
-        })
-       })
-     }
-     
-   }
-  },
- 
+    }
+
   
-}
+  }
+  
 </script>
 
 <style scoped>
