@@ -1,35 +1,25 @@
-
 <template>
-  <div class="admin" >
+  <div class="groupList" >
     <header>
-      <h1>管理后台</h1>
+      <h1>后台管理</h1>
     </header>
-    <div class="wrapper" v-if="admin">
-      <div class="address">
-        <h4>组别生成</h4>
-        <div>
-          组别名称：
-          <input type="text" v-model="group">
-        </div>
-        <button @click="make">生成</button>
-      </div>
+    <div class="wrapper">
        <div class="group-list">
-        <h4>组别管理</h4>
+        <h4>用户列表</h4>
         <div class="group-list-wrapper">
           <table>
             <tr>
-              <th>组别名称</th>
-              <th>组别人数</th>
-              <th>组别总分</th>
-              <th>创建时间</th>
+              <th>用户姓名</th>
+              <th>绘制次数</th>
+              <th>最高分数</th>
+              <th>最近绘制时间</th>
             </tr>
              <tr v-for="item in list" @click="routerTo">
-                <td>{{item.name}}</td>
-                <td>{{item.numSum}}</td>
+                <td>{{item.uname ? item.uname : item.username}}</td>
+                <td>{{item.sum}}</td>
                 <td>{{item.score}}</td>
-                <td>{{item.create_time}}</td>
-                <td class="id">{{item.group_id}}</td>
-                <td class="del" @click="del">删除</td>
+                <td>{{item.lastTime}}</td>
+                <td class="id">{{item.user_id}}</td>
               </tr>
           </table>
           <div class="pages">
@@ -43,34 +33,29 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="login" v-show="login">
-      <div>
-         用户名:
-         <input type="text" v-model="username">
+      <div class="chart">
+        <h4>分数图表</h4>
+        <div id="myChart">
+
+        </div>
       </div>
-      <div>
-        密码:
-        <input type="password" v-model="password">
-      </div>
-      <button @click="submite">登录</button>
-      
     </div>
-   
-    <div id="qrcode" v-show="qrcode" @click="close"></div>
   </div>
 </template>
 
 <script>
 import doCookie from '@/server/docookie'
 import getData from '@/server/vue-resource'
-import qrcode from '@/server/qrcode'
+// 引入echart基本模板
+let echarts = require('echarts/lib/echarts')
+require('echarts/lib/chart/bar')
+// 引入提示框和title组件
+require('echarts/lib/component/tooltip')
+require('echarts/lib/component/title')
 export default {
   name: 'app',
   data:function (){
     return {
-      login:true,
-      admin:false,
       username:'',
       password:'',
       group:'',
@@ -80,26 +65,40 @@ export default {
       arr :[],
       sum:0,
       showNum:10,
-      ID:''
+      ID:'',
+      groupId:'',
+      groupMem:[],
+      groupScore:[],
     }
   },
   mounted:function () {
     var $this = this;
-    if(doCookie('get','admin')){
-      this.login = false;
-      this.admin = true;
-    }
-    getData('/selectGroup','post',{ "current": "0",
-    "pageLen": $this.showNum}).then((res)=>{
-      console.log(res.body.data)
-      var data = res.body.data;
-      var arr = $this.arr;
-      for(let i = 0;i < data.sum;i++){
-        arr.push(i)
-      }
-      $this.list = data.group_lst;
-      $this.sum = data.sum
-    })
+    //获取groupID
+      $this.groupId = $this.$route.query.groupId;
+      getData('/groupDetail','post',{ "current": "0",
+      "pageLen": $this.showNum,"group_id":$this.groupId}).then((res)=>{
+        console.log(res.body.data)
+        var data = res.body.data;
+        var arr = $this.arr;
+        var groupMem = $this.groupMem
+        var groupScore = $this.groupScore
+        // groupMem = [];
+        // groupScore = [];
+        for(let i = 0;i < data.sum;i++){
+          arr.push(i)
+        }
+        $this.list = data.groupLst;
+        $this.sum = data.sum
+        data.groupLst.forEach(function(v,i){
+          groupMem.push(v.uname ? v.uname : v.username)
+          groupScore.push(v.score)
+        })
+        $this.$nextTick(() => {
+          $this.drawChart()
+          // console.log(document.getElementById('myChart'))
+        });
+      })
+    
   },
   methods:{
     submite(){
@@ -109,47 +108,6 @@ export default {
         doCookie('set','admin',this.username)
       }
     },
-    make(){
-      var $this = this;
-      var obj = {
-        user_id : '1',
-        name : this.group
-      }
-      getData('/newGroup','post',JSON.stringify(obj) ).then((res)=>{
-        var data = res.body.data;
-        if(res.body.code === 0){
-          alert('创建成功')
-          $this.qrcode = true;
-          console.log(data)
-          $this.ID = data;
-          //二维码生成
-          var qr = qrcode()
-          var qrCode = new qr('qrcode', { 
-            text: 'your content', 
-            width: 512, 
-            height: 512, 
-            colorDark : '#000000', 
-            colorLight : '#ffffff', 
-          });
-          qrCode.makeCode('http://zhchy.info'+'?group='+this.ID);
-          getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum}).then((res)=>{
-            var data = res.body.data;
-            $this.list = data.group_lst;
-          })
-        }else if(res.body.code === -2) {
-          $this.qrcode = true;
-          var qr = qrcode()
-          var qrCode = new qr('qrcode', { 
-            text: 'your content', 
-            width: 512, 
-            height: 512, 
-            colorDark : '#000000', 
-            colorLight : '#ffffff', 
-          });
-          qrCode.makeCode('http://zhchy.info'+'?group='+res.body.data);
-        }
-      })
-      },
     close(){
       document.getElementById('qrcode').innerHTML=''
       this.qrcode=false
@@ -179,31 +137,79 @@ export default {
       var num = this.sum-1;
       this.nowPage = num;
     },
-    del(e){
-      var $this = this;
-      var name = e.target.parentNode.children[0].innerHTML;
-      var sure = confirm('是否删除'+name+'?')
-      if(sure){
-        getData('/deleteGroup','post',{"name": name,}).then(()=>{
-          getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum}).then((res)=>{
-            var data = res.body.data;
-            $this.list = data.group_lst;
-          })
-        })
-      }
-      
-    },
     _list(){
       var num = this.nowPage;
       var $this = this;
-      getData('/selectGroup','post',{"current": num,"pageLen": this.showNum}).then((res)=>{
+      this.groupLst = [];
+      this.groupMem = [];
+      getData('/groupDetail','post',{ "current": num,
+      "pageLen": $this.showNum,"group_id":$this.groupId}).then((res)=>{
         var data = res.body.data;
-        $this.list = data.group_lst;
+        $this.list = data.groupLst;
+        var groupMem = $this.groupMem
+        var groupScore = $this.groupScore
+        data.groupLst.forEach(function(v,i){
+          groupMem.push(v.uname ? v.uname : v.username)
+          groupScore.push(v.score)
+        })
+        $this.$nextTick(() => {
+          $this.drawChart()
+          // console.log(document.getElementById('myChart'))
+        });
       })
     },
     routerTo(e){
       var groupName = e.target.parentNode.children[4].innerHTML;
-      this.$router.push({path:'/admin/groupList',query:{groupId:groupName}})
+      this.$router.push({path:'/admin/groupList/person',query:{user_id:groupName}})
+    },
+    drawChart(){
+      console.log(document.getElementById('myChart'))
+      // 基于准备好的dom，初始化echarts实例
+      let myChart = echarts.init(document.getElementById('myChart'))
+      // 绘制图表
+      myChart.setOption({
+        title:{
+                text:'用户分数'
+            },
+         color: ['#3398DB'],
+        tooltip : {
+            trigger: 'axis',
+            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis : [
+            {
+                type : 'category',
+                data : this.groupMem,
+                axisTick: {
+                    alignWithLabel: true
+                },
+                
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value',
+                maxInterval:20
+            }
+        ],
+        series : [
+            {
+                name:'最高分数',
+                type:'bar',
+                barWidth: '60%',
+                data:this.groupScore,
+                
+            }
+        ]
+      });
     }
   },
     computed:{
@@ -234,7 +240,7 @@ export default {
 </script>
 
 <style scoped>
-  .admin{
+  .groupList{
     background:#eaedf1;
   }
   header{
@@ -329,37 +335,6 @@ export default {
   }
 
 
-  .login{
-    width:500px;
-    height:300px;
-    border:3px solid #000;
-    border-radius:30px;
-    position: absolute;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    margin:auto;
-    font-size:30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-  }
-  .login input{
-    width:150px;
-    height:25px;
-  }
-  .login button{
-    font-size:25px;
-    height:50px;
-    width:100px;
-    line-height:50px;
-    background:#fff;
-    border:1px solid #000;
-  }
-
-
   .pages ul {
     margin-top:40px;
     display: flex;
@@ -387,15 +362,30 @@ export default {
     color:#fff;
   }
 
-
-  #qrcode{
-    width:512px;
-    height:512px;
-    position: absolute;
-    top:0;
-    left:0;
-    bottom:0;
-    right:0;
-    margin:auto;
+  .chart{
+    margin-top:30px;
+    /* height: 200px; */
+    width:1024px;
+    background:#fff;
+    padding:20px;
+    font-size:25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    margin-bottom:30px;
+  }
+  .group-list-wrapper{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
+  .chart h4{
+    font-size:40px;
+  }
+  .chart #myChart{
+    width:1000px;
+    height:500px;
   }
 </style>

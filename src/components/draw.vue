@@ -238,6 +238,7 @@ export default {
             postData.cookie_id = doCookie('get', 'cookie_id');
             postData.deviation = match.canvasData.matching.toFixed(5).toString();
             postData.score = $this.score.toString();
+            postData.blood = '0';
             console.log(postData)
             var oJSON = JSON.stringify(postData)
             console.log(oJSON)

@@ -24,6 +24,10 @@ const choose = () =>
   import ('@/pages/choose')
 const admin = () =>
   import ('@/pages/admin')
+const groupList = () =>
+  import ('@/pages/groupList')
+const person = () =>
+  import ('@/pages/person')
 
 Vue.use(Router)
 export default new Router({
@@ -66,7 +70,17 @@ export default new Router({
     },
     {
       path: '/admin',
-      component: admin
+      component: admin,
+      // children: [{
+      //   path: 'groupList',
+      //   component: groupList
+      // }]
+    }, {
+      path: '/admin/groupList',
+      component: groupList
+    }, {
+      path: '/admin/groupList/person',
+      component: person
     }
   ]
 })
