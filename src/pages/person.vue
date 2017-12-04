@@ -42,12 +42,16 @@
         </div>
       </div>
     </div>
+    <div class="res" v-show="resShow">
+      <res :res_id='res_id' @closeRes="close"></res>
+    </div>
   </div>
 </template>
 
 <script>
 import doCookie from '@/server/docookie'
 import getData from '@/server/vue-resource'
+import res from '@/components/res.vue'
 // 引入基本模板
 let echarts = require('echarts/lib/echarts')
 require('echarts/lib/chart/line')
@@ -57,22 +61,24 @@ require('echarts/lib/component/title')
 
 export default {
   name: 'app',
+  components:{
+    res
+  },
   data:function (){
     return {
-      login:true,
       username:'',
       password:'',
       group:'',
-      qrcode:false,
       list:[],
       nowPage:0,
       arr :[],
       sum:0,
       showNum:10,
-      ID:'',
       user_id:'',
       timeArr:[],
       scoreArr:[],
+      resShow:false,
+      res_id:0,
     }
   },
   mounted:function () {
@@ -101,12 +107,7 @@ export default {
       this.$nextTick(() => {
         this.drawChart()
       });
-      
     })
-  },
-  compiled:function (){
-    console.log('a')
-    this.drawChart()
   },
   methods:{
     submite(){
@@ -163,11 +164,13 @@ export default {
       })
     },
     routerTo(e){
-      var groupName = e.target.parentNode.children[5].innerHTML;
-      this.$router.push({path:'/groupList',query:{groupName:groupName}})
+      var res_id = e.target.parentNode.children[5].innerHTML;
+      // this.$router.push({path:'/groupList',query:{groupName:groupName}})
+      this.res_id = res_id;
+      this.resShow = true;
+      
     },
     drawChart(){
-      console.log(document.getElementById('myChart'))
       // 基于准备好的dom，初始化echarts实例
       let myChart = echarts.init(document.getElementById('myChart'))
       // 绘制图表
@@ -201,6 +204,9 @@ export default {
                 data:this.scoreArr
             }]
       });
+    },
+    close(){
+      this.resShow = false;
     }
   },
     computed:{
@@ -350,5 +356,16 @@ export default {
   .chart #myChart{
     width:1000px;
     height:500px;
+  }
+
+  .res{
+    width:900px;
+    height:900px;
+    position: fixed;
+    top:50%;
+    left:50%;
+    margin:-450px 0 0 -450px;
+    background:#fff;
+    border:2px solid #000;
   }
 </style>
