@@ -27,6 +27,7 @@
         <router-link tag="button" :to="{path:userId ? 'choose' :'game?none=1',query:{group:group}}">{{username ? '再来一局' : '再看看'}}</router-link>
         
       </div>
+      <span>注册可以解锁更多图案哦！</span>
     </div>
    <transition name="fade">
         <div class="drump" v-show="loading">

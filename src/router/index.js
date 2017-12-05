@@ -28,6 +28,14 @@ const groupList = () =>
   import ('@/pages/groupList')
 const person = () =>
   import ('@/pages/person')
+const draw_zi = () =>
+  import ('@/components/draw-zi')
+const draw_mi = () =>
+  import ('@/components/draw-mi')
+const draw_tu = () =>
+  import ('@/components/draw-tu')
+const draw_miao = () =>
+  import ('@/components/draw-miao')
 
 Vue.use(Router)
 export default new Router({
@@ -46,6 +54,18 @@ export default new Router({
       }, {
         path: 'triangle',
         component: triangle
+      }, {
+        path: 'yong',
+        component: draw_zi
+      }, {
+        path: 'mi',
+        component: draw_mi
+      }, {
+        path: 'tu',
+        component: draw_tu
+      }, {
+        path: 'miao',
+        component: draw_miao
       }]
     },
     {

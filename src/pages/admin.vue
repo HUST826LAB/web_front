@@ -3,6 +3,7 @@
   <div class="admin" >
     <header>
       <h1>管理后台</h1>
+      <span @click="signOut" v-show="user_id">注销</span>
     </header>
     <div class="wrapper" v-if="admin">
       <div class="address">
@@ -44,7 +45,7 @@
         </div>
       </div>
     </div>
-    <div class="login" v-show="login">
+    <div class="login" v-show="login"  @keyup.13="submite">
       <div>
          用户名:
          <input type="text" v-model="username">
@@ -65,6 +66,7 @@
 import doCookie from '@/server/docookie'
 import getData from '@/server/vue-resource'
 import qrcode from '@/server/qrcode'
+import sha from '@/server/sha'
 export default {
   name: 'app',
   data:function (){
@@ -80,40 +82,66 @@ export default {
       arr :[],
       sum:0,
       showNum:10,
-      ID:''
+      ID:'',
+      user_id:0,
+      postData:{},
     }
   },
   mounted:function () {
     var $this = this;
-    if(doCookie('get','admin')){
+    var cookieUserId = doCookie('get','admin')
+    if(cookieUserId){
+      this.user_id = cookieUserId
       this.login = false;
       this.admin = true;
+      getData('/selectGroup','post',{ "current": "0","user_id":$this.user_id,
+      "pageLen": $this.showNum}).then((res)=>{
+        console.log(res.body)
+        var data = res.body.data;
+        var arr = $this.arr;
+        for(let i = 0;i < data.sum;i++){
+          arr.push(i)
+        }
+        $this.list = data.group_lst;
+        $this.sum = data.sum
+      })
     }
-    getData('/selectGroup','post',{ "current": "0",
-    "pageLen": $this.showNum}).then((res)=>{
-      console.log(res.body.data)
-      var data = res.body.data;
-      var arr = $this.arr;
-      for(let i = 0;i < data.sum;i++){
-        arr.push(i)
-      }
-      $this.list = data.group_lst;
-      $this.sum = data.sum
-    })
   },
   methods:{
     submite(){
-      if(this.username=='admin' && this.password=='admin'){
-        this.login = false;
-        this.admin = true;
-        doCookie('set','admin',this.username)
-      }
+      var sha1 = new sha('SHA-1','TEXT')
+      var $this = this;
+      this.postData.username = this.username
+      sha1.update(this.password)
+      this.postData.password = sha1.getHash('HEX')
+      getData('/managerLogin','post',this.postData).then((res)=>{
+        console.log(res.body.data)
+        var data = res.body;
+        if(data.code === 0){
+          $this.user_id = data.data;
+          getData('/selectGroup','post',{ "current": "0","user_id":$this.user_id,
+          "pageLen": $this.showNum}).then((res)=>{
+            console.log(res.body)
+            var data = res.body.data;
+            var arr = $this.arr;
+            for(let i = 0;i < data.sum;i++){
+              arr.push(i)
+            }
+            $this.list = data.group_lst;
+            $this.sum = data.sum
+            this.login = false;
+            this.admin = true;
+            doCookie('set','admin',$this.user_id)
+          })
+        }
+      })
     },
     make(){
       var $this = this;
       var obj = {
         user_id : '1',
-        name : this.group
+        name : this.group,
+        // user_id: this.user_id
       }
       getData('/newGroup','post',JSON.stringify(obj) ).then((res)=>{
         var data = res.body.data;
@@ -132,7 +160,7 @@ export default {
             colorLight : '#ffffff', 
           });
           qrCode.makeCode('http://zhchy.info'+'?group='+this.ID);
-          getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum}).then((res)=>{
+          getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum,"user_id":this.user_id}).then((res)=>{
             var data = res.body.data;
             $this.list = data.group_lst;
           })
@@ -185,7 +213,7 @@ export default {
       var sure = confirm('是否删除'+name+'?')
       if(sure){
         getData('/deleteGroup','post',{"name": name,}).then(()=>{
-          getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum}).then((res)=>{
+          getData('/selectGroup','post',{"current": this.nowPage,"pageLen": $this.showNum,"user_id":this.user_id}).then((res)=>{
             var data = res.body.data;
             $this.list = data.group_lst;
           })
@@ -196,7 +224,7 @@ export default {
     _list(){
       var num = this.nowPage;
       var $this = this;
-      getData('/selectGroup','post',{"current": num,"pageLen": this.showNum}).then((res)=>{
+      getData('/selectGroup','post',{"current": num,"pageLen": this.showNum,"user_id":this.user_id}).then((res)=>{
         var data = res.body.data;
         $this.list = data.group_lst;
       })
@@ -204,6 +232,10 @@ export default {
     routerTo(e){
       var groupName = e.target.parentNode.children[4].innerHTML;
       this.$router.push({path:'/admin/groupList',query:{groupId:groupName}})
+    },
+    signOut(){
+      doCookie('set','admin','')
+      location.href = location.href;
     }
   },
     computed:{
@@ -243,9 +275,19 @@ export default {
     background:#373d41;
     color:#fff;
     line-height:50px;
+    position: relative;
   }
   header h1{
     font-size:35px;
+  }
+  header span{
+    position: absolute;
+    text-align: right;
+    top:0px;
+    font-size:18px;
+    right:20px;
+    cursor: pointer;
+    font-weight: bold;
   }
   .wrapper{
     display: flex;

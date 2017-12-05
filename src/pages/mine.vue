@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="footer">
-        <router-link tag="button" :to="{path:'/game?none=1',query:{group:groupID}}">游戏</router-link>
+        <router-link tag="button" :to="{path:'/choose',query:{group:groupID}}">游戏</router-link>
         <button @click="signOut">退出登录</button>
       </div>
       
