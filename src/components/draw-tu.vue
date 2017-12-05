@@ -327,7 +327,7 @@ export default {
 
         }else{
             var $self = this;
-            var canvas = document.getElementById("canvas");
+            var canvas = document.querySelectorAll("#canvas")[0];
             var ctx = canvas.getContext('2d');
             var oData = '';
             var canX = document.querySelectorAll('#canvas')[0].offsetLeft;
@@ -336,19 +336,20 @@ export default {
             var cBeginY = this.canvasHeight / 2;
             var cR = Math.min(this.canvasHeight,this.canvasWidth) / 2.5;
             this.canvas = ctx;
-            ctx.lineWidth = $self.canvasWidth / 600 * 40;
+            ctx.lineWidth = $self.canvasWidth / 600 * 15;
             var img = new Image();
             var imgWidth = $self.canvasWidth / 600 * 600;
             var imgHeight = imgWidth;
             // /static/img/yong.bd4e66c.png
-            img.src = '../static/mi.png'
+            img.src = '../static/tu.png'
             img.onload = function () {
-                ctx.drawImage(img,0,0,imgWidth,imgHeight)
-                //分数判断初始化
-                match.canvasData.draw.rgba=[0,128,0,255]
-                match.canvasData.original.rgba=[255,0,0,255]
-                match.canvasData.original.rgba1=[254,254,254,255]
-                match.calMatching(canvas);
+            ctx.drawImage(img,0,0,imgWidth,imgHeight)
+            //分数判断初始化
+            match.canvasData.draw.rgba=[0,128,0,255]
+            match.canvasData.original.rgba=[255,0,0,255]
+            match.canvasData.original.rgba1=[254,254,254,255]
+            match.canvasData.state = 1;
+            match.calMatching(canvas);
             }
             this.postData.imgWidth = imgWidth;
             this.postData.imgHeight = imgHeight;

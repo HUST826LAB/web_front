@@ -348,6 +348,7 @@ export default {
                 match.canvasData.draw.rgba=[0,128,0,255]
                 match.canvasData.original.rgba=[255,0,0,255]
                 match.canvasData.original.rgba1=[254,254,254,255]
+                match.canvasData.state = 1;
                 match.calMatching(canvas);
             }
             this.postData.imgWidth = imgWidth;

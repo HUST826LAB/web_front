@@ -19,7 +19,7 @@
                 <td>{{index+1}}</td>
                 <td>{{item.score}}</td>
                 <td>{{(item.time_len/1000).toFixed(2)+'s'}}</td>
-                <td>{{item.blood=='0'?'圆':'三角'}}</td>
+                <td>{{item.blood}}</td>
                 <td>{{item.create_time.substring(0,19)}}</td>
                 <td class="id">{{item.res_id}}</td>
               </tr>
