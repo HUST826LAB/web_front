@@ -4,6 +4,7 @@ import Vue from 'vue'
 
 Vue.use(vueResource)
 
+
 export default function(url, type = 'get', data) {
   if (type == 'get') {
     return Vue.http.get(testUrl + url, data)
