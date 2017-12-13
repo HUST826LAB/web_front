@@ -49,7 +49,8 @@ export default {
       pointArr:[],
       time:0,
       lock:[0,0,0,0],
-      goText:'重画'
+      goText:'重画',
+      downArr:'',
     }
   },
   created:function () {
@@ -179,7 +180,7 @@ export default {
         draw(ox, oy, x, y)
         ox = x;
         oy = y;
-        oData = oData + x.toString() + ',' + y.toString() + ',';
+        $this.downArr+= x + ',' + y + ','
         event.preventDefault();
         if(x > imgWidth/2 && y < imgHeight / 2) {
             $this.lock[0] = 1;
@@ -198,6 +199,8 @@ export default {
     function up(e) {
         removeEvent(canvas, touchmove, move)
         $this.time = new Date().getTime() - $this.oTime
+        $this.pointArr.push($this.downArr.substring(0,$this.downArr.length - 1))
+        $this.downArr = '';
         // removeEvent(document, touchend, up)
         this.finish = true
         var sum = 0;
@@ -217,7 +220,6 @@ export default {
         ctx.beginPath();
       
         ctx.moveTo(ox, oy);
-        $this.pointArr.push(ox,oy)
         ctx.lineTo(x, y);
         ctx.lineJoin="round"
         ctx.strokeStyle = 'green';
@@ -272,7 +274,7 @@ export default {
                 //数据交互部分
             var postData = $this.postData;
             var obj = getUrl();
-            postData.coordinate = $this.pointArr.join(',')
+            postData.coordinate = $this.pointArr.join(';');
             postData.time_len = this.time.toString();
             //获取用户设备
             navigator.userAgent ? postData.device = navigator.userAgent : undefined;
@@ -351,8 +353,6 @@ export default {
                 match.canvasData.state = 1;
                 match.calMatching(canvas);
             }
-            this.postData.imgWidth = imgWidth;
-            this.postData.imgHeight = imgHeight;
         }
     }
   }

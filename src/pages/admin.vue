@@ -24,11 +24,11 @@
               <th>组别总分</th>
               <th>创建时间</th>
             </tr>
-             <tr v-for="item in list" @click="routerTo">
-                <td>{{item.name}}</td>
-                <td>{{item.numSum}}</td>
-                <td>{{item.score}}</td>
-                <td>{{item.create_time}}</td>
+             <tr v-for="item in list" >
+                <td @click="routerTo">{{item.name}}</td>
+                <td @click="routerTo">{{item.numSum}}</td>
+                <td @click="routerTo">{{item.score}}</td>
+                <td @click="routerTo">{{item.create_time}}</td>
                 <td class="id">{{item.group_id}}</td>
                 <td class="del" @click="del">删除</td>
               </tr>
@@ -139,9 +139,9 @@ export default {
     make(){
       var $this = this;
       var obj = {
-        user_id : '1',
+        user_id : $this.user_id,
         name : this.group,
-        // user_id: this.user_id
+        owner_id: this.user_id
       }
       getData('/newGroup','post',JSON.stringify(obj) ).then((res)=>{
         var data = res.body.data;

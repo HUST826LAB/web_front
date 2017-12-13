@@ -84,7 +84,7 @@ export default {
   }
   .choose .wrapper .trangle{
     background: url('../assets/icon.png') no-repeat;
-    background-position:-152px 0px;
+    background-position:-152px 2px;
   }
   .choose .wrapper .mi{
     background: url('../assets/icon.png') no-repeat;

@@ -98,6 +98,22 @@ export default {
       }
       $this.list = data.userList;
       $this.sum = data.sum;
+      $this.list.forEach((v,i,a)=>{
+        var blood = v.blood;
+        if(blood == 0){
+          v.blood = '圆'
+        }else if(blood == 1){
+          v.blood = '三角'
+        }else if(blood == 2){
+          v.blood = '米字'
+        }else if(blood == 3){
+          v.blood = '永字'
+        }else if(blood == 4){
+          v.blood = '兔子'
+        }else if(blood == 5){
+          v.blood = '猫'
+        }
+      })
       var timeArr = $this.timeArr;
       var scoreArr = $this.scoreArr;
       data.userList.forEach((v,i)=>{
@@ -156,6 +172,22 @@ export default {
         var timeArr = $this.timeArr;
         var scoreArr = $this.scoreArr;
         $this.list = data.userList;
+        $this.list.forEach((v,i,a)=>{
+          var blood = v.blood;
+          if(blood == 0){
+            v.blood = '圆'
+          }else if(blood == 1){
+            v.blood = '三角'
+          }else if(blood == 2){
+            v.blood = '米字'
+          }else if(blood == 3){
+            v.blood = '永字'
+          }else if(blood == 4){
+            v.blood = '兔子'
+          }else if(blood == 5){
+            v.blood = '猫'
+          }
+        })
         data.userList.forEach((v,i)=>{
           timeArr.push(v.create_time)
           scoreArr.push(v.score)

@@ -32,11 +32,11 @@ export default {
           var ctx = canvas.getContext('2d');
           ctx.clearRect(0,0,1600,1600)
           //对图像类型进行判断，如果是圆
-          if(data.datum.circle_r){
+          if(data.resDetail.type == 0){
             var cBeginX = data.datum.circle_x;
             var cBeginY = data.datum.circle_y;
             var cR = data.datum.circle_r;
-            var arr = data.resDetail.coordinate.split(',')
+            var arr = data.resDetail.coordinate.split(';')
             ctx.beginPath();
             ctx.arc(cBeginX, cBeginY, cR, 0, Math.PI * 2, true);
             ctx.strokeStyle = 'red';
@@ -45,9 +45,9 @@ export default {
             ctx.closePath();
             draw(arr)
           //如果是三角
-          }else if(data.datum.summit0_x){
+          }else if(data.resDetail.type == 1){
             var summit = data.datum;
-            var arr = data.resDetail.coordinate.split(',')
+            var arr = data.resDetail.coordinate.split(';')
             console.log(summit)
             ctx.beginPath();
             ctx.moveTo(summit.summit0_x,summit.summit0_y)
@@ -58,22 +58,74 @@ export default {
             ctx.lineWidth = 20
             ctx.stroke();
             draw(arr)
+          }else if(data.resDetail.type == 2){
+            var summit = data.datum;
+            var arr = data.resDetail.coordinate.split(';');
+            var img = new Image();
+            var imgWidth = summit.image_width;
+            var imgHeight = summit.image_height ? summit.image_height:summit.image_width;
+            ctx.lineWidth = imgWidth / 600 * 40;
+            img.src = '../../static/mi.png'
+            img.onload = function () {
+              ctx.drawImage(img,0,0,imgWidth,imgHeight)
+              draw(arr);
+            }
+          }else if(data.resDetail.type == 3){
+            var summit = data.datum;
+            var arr = data.resDetail.coordinate.split(';');
+            var img = new Image();
+            var imgWidth = summit.image_width;
+            var imgHeight = summit.image_height ? summit.image_height:summit.image_width;
+            ctx.lineWidth = imgWidth / 600 * 40;
+            img.src = '../../static/yong.png'
+            img.onload = function () {
+              ctx.drawImage(img,0,0,imgWidth,imgHeight)
+              draw(arr);
+            }
+          }else if(data.resDetail.type == 4){
+            var summit = data.datum;
+            var arr = data.resDetail.coordinate.split(';');
+            var img = new Image();
+            var imgWidth = summit.image_width;
+            var imgHeight = summit.image_height ? summit.image_height:summit.image_width;
+            ctx.lineWidth = imgWidth / 600 * 15;
+            img.src = '../../static/tu.png'
+            img.onload = function () {
+              ctx.drawImage(img,0,0,imgWidth,imgHeight)
+              draw(arr);
+            }
+          }else if(data.resDetail.type == 5){
+            var summit = data.datum;
+            var arr = data.resDetail.coordinate.split(';');
+            var img = new Image();
+            var imgWidth = summit.image_width;
+            var imgHeight = summit.image_height ? summit.image_height:summit.image_width;
+            ctx.lineWidth = imgWidth / 600 * 10;
+            img.src = '../../static/miao.png'
+            img.onload = function () {
+              ctx.drawImage(img,0,0,imgWidth,imgHeight)
+              draw(arr);
+            }
           }
         }else{
 
         }
         //还原用户轨迹函数，接收绘画点数组
-        function draw(arr){
-          console.log(arr)
-          var len = arr.length;
-          for(let i = 0;i < len-2;i+=2){
-            ctx.beginPath();
-            ctx.moveTo(arr[i],arr[i+1])
-            ctx.lineTo(arr[i+2],arr[i+3])
-            ctx.lineJoin="round"
-            ctx.strokeStyle = 'green';
-            ctx.closePath();                
-            ctx.stroke()
+        function draw(arr1){
+          console.log(arr1)
+          var len1 = arr1.length;
+          for(let j = 0; j < len1; j++){
+            var arr = arr1[j].split(',');
+            var len = arr.length;
+            for(let i = 0;i < len-2;i+=2){
+              ctx.beginPath();
+              ctx.moveTo(arr[i],arr[i+1])
+              ctx.lineTo(arr[i+2],arr[i+3])
+              ctx.lineJoin="round"
+              ctx.strokeStyle = 'green';
+              ctx.closePath();                
+              ctx.stroke()
+            }
           }
         }
       })
