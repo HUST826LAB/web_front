@@ -33,15 +33,7 @@
                 <td class="del" @click="del">删除</td>
               </tr>
           </table>
-          <div class="pages">
-            <ul>
-              <li @click="top" v-show="nowPage>2">首页</li>
-              <li @click="up" v-show="nowPage >0">上一页</li>
-              <li @click="changePage" v-for="num in pages" :class="{active : num == nowPage}">{{num+1}}</li>
-              <li @click="down" v-show="nowPage<sum-1">下一页</li>
-              <li @click="bottom" v-show="sum-nowPage >3">尾页</li>
-            </ul>
-          </div>
+          <fenye :user_id="user_id" @setList="getList" sendText="user_id" url="/selectGroup" listName="group_lst"></fenye>
         </div>
       </div>
     </div>
@@ -67,6 +59,7 @@ import doCookie from '@/server/docookie'
 import getData from '@/server/vue-resource'
 import qrcode from '@/server/qrcode'
 import sha from '@/server/sha'
+import fenye from '@/components/fenye'
 export default {
   name: 'app',
   data:function (){
@@ -87,24 +80,17 @@ export default {
       postData:{},
     }
   },
+  components:{
+    fenye
+  },
   mounted:function () {
     var $this = this;
     var cookieUserId = doCookie('get','admin')
     if(cookieUserId){
       this.user_id = cookieUserId
+      console.log('f')
       this.login = false;
       this.admin = true;
-      getData('/selectGroup','post',{ "current": "0","user_id":$this.user_id,
-      "pageLen": $this.showNum}).then((res)=>{
-        console.log(res.body)
-        var data = res.body.data;
-        var arr = $this.arr;
-        for(let i = 0;i < data.sum;i++){
-          arr.push(i)
-        }
-        $this.list = data.group_lst;
-        $this.sum = data.sum
-      })
     }
   },
   methods:{
@@ -119,20 +105,9 @@ export default {
         var data = res.body;
         if(data.code === 0){
           $this.user_id = data.data;
-          getData('/selectGroup','post',{ "current": "0","user_id":$this.user_id,
-          "pageLen": $this.showNum}).then((res)=>{
-            console.log(res.body)
-            var data = res.body.data;
-            var arr = $this.arr;
-            for(let i = 0;i < data.sum;i++){
-              arr.push(i)
-            }
-            $this.list = data.group_lst;
-            $this.sum = data.sum
-            this.login = false;
-            this.admin = true;
-            doCookie('set','admin',$this.user_id)
-          })
+          this.login = false;
+          this.admin = true;
+          doCookie('set','admin',$this.user_id)
         }
       })
     },
@@ -182,30 +157,9 @@ export default {
       document.getElementById('qrcode').innerHTML=''
       this.qrcode=false
     },
-    //分页部分
-    changePage(e){
-      var num = e.target.innerHTML -1;
-      this.nowPage = num;
-      
-    },
-    top(){
-     var num = 0;
-    this.nowPage = num;
-      var arr = this.arr
-      var sum = arr.length;
-     
-    },
-    up(){
-      var num = this.nowPage - 1;
-      this.nowPage = num;
-    },
-    down(){
-      var num = this.nowPage + 1;
-      this.nowPage = num;
-    },
-    bottom(){
-      var num = this.sum-1;
-      this.nowPage = num;
+    //从子组件获取数据
+    getList(list){
+      this.list = list;
     },
     del(e){
       var $this = this;
@@ -221,14 +175,7 @@ export default {
       }
       
     },
-    _list(){
-      var num = this.nowPage;
-      var $this = this;
-      getData('/selectGroup','post',{"current": num,"pageLen": this.showNum,"user_id":this.user_id}).then((res)=>{
-        var data = res.body.data;
-        $this.list = data.group_lst;
-      })
-    },
+   
     routerTo(e){
       var groupName = e.target.parentNode.children[4].innerHTML;
       this.$router.push({path:'/admin/groupList',query:{groupId:groupName}})
@@ -238,27 +185,7 @@ export default {
       location.href = location.href;
     }
   },
-    computed:{
-      pages:function () {
-        var num = this.nowPage;
-        var arr = this.arr
-        var sum = arr.length;
-        if(num < 2){
-          return arr.slice(0,5)
-        }else if(num >= sum - 2 ){
-          return arr.slice(sum-5,sum)
-        }else{
-          return arr.slice(num -2,num+3)
-        }
-        
-      },
-      
-    },
-    watch:{
-      nowPage:function () {
-        this._list()
-      }
-    }
+   
 
   
   }
