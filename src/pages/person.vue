@@ -24,15 +24,7 @@
                 <td class="id">{{item.res_id}}</td>
               </tr>
           </table>
-          <div class="pages">
-            <ul>
-              <li @click="top" v-show="nowPage>2">首页</li>
-              <li @click="up" v-show="nowPage >0">上一页</li>
-              <li @click="changePage" v-for="num in pages" :class="{active : num == nowPage}">{{num+1}}</li>
-              <li @click="down" v-show="nowPage<sum-1">下一页</li>
-              <li @click="bottom" v-show="sum-nowPage >3">尾页</li>
-            </ul>
-          </div>
+          <fenye :user_id="user_id" @setList="getList" sendText="user_id" url="/userDetail" listName="userList"></fenye>
         </div>
       </div>
       <div class="chart">
@@ -52,6 +44,7 @@
 import doCookie from '@/server/docookie'
 import getData from '@/server/vue-resource'
 import res from '@/components/res.vue'
+import fenye from '@/components/fenye.vue'
 // 引入基本模板
 let echarts = require('echarts/lib/echarts')
 require('echarts/lib/chart/line')
@@ -62,7 +55,8 @@ require('echarts/lib/component/title')
 export default {
   name: 'app',
   components:{
-    res
+    res,
+    fenye
   },
   data:function (){
     return {
@@ -81,23 +75,32 @@ export default {
       res_id:0,
     }
   },
-  mounted:function () {
+  created:function () {
     var $this = this;
     $this.user_id = $this.$route.query.user_id;
- 
-    
-    getData('/userDetail','post',{ "current": "0",
-    "pageLen": $this.showNum,"user_id":$this.user_id}).then((res)=>{
-      console.log(res.body.data)
-      var data = res.body.data;
-      var arr = $this.arr;
-      $this.timeArr = [];
-      $this.scoreArr = [];
-      for(let i = 0;i < data.sum;i++){
-        arr.push(i)
+  },
+  methods:{
+    submite(){
+      if(this.username=='admin' && this.password=='admin'){
+        this.login = false;
+        this.admin = true;
+        doCookie('set','admin',this.username)
       }
-      $this.list = data.userList;
-      $this.sum = data.sum;
+    },
+    close(){
+      document.getElementById('qrcode').innerHTML=''
+      this.qrcode=false
+    },
+   //从子组件获取数据
+    getList(list){
+      var $this = this;
+      this.list = list;
+      $this.scoreArr = [];
+      $this.timeArr = [];
+      $this.list.forEach((v,i)=>{
+        $this.timeArr.push(v.create_time)
+        $this.scoreArr.push(v.score)
+      })
       $this.list.forEach((v,i,a)=>{
         var blood = v.blood;
         if(blood == 0){
@@ -114,87 +117,9 @@ export default {
           v.blood = '猫'
         }
       })
-      var timeArr = $this.timeArr;
-      var scoreArr = $this.scoreArr;
-      data.userList.forEach((v,i)=>{
-        timeArr.push(v.create_time)
-        scoreArr.push(v.score)
-      })
-      this.$nextTick(() => {
-        this.drawChart()
-      });
-    })
-  },
-  methods:{
-    submite(){
-      if(this.username=='admin' && this.password=='admin'){
-        this.login = false;
-        this.admin = true;
-        doCookie('set','admin',this.username)
-      }
+      this.drawChart();
     },
-    close(){
-      document.getElementById('qrcode').innerHTML=''
-      this.qrcode=false
-    },
-    //分页部分
-    changePage(e){
-      var num = e.target.innerHTML -1;
-      this.nowPage = num;
-      
-    },
-    top(){
-     var num = 0;
-    this.nowPage = num;
-      var arr = this.arr
-      var sum = arr.length;
-     
-    },
-    up(){
-      var num = this.nowPage - 1;
-      this.nowPage = num;
-    },
-    down(){
-      var num = this.nowPage + 1;
-      this.nowPage = num;
-    },
-    bottom(){
-      var num = this.sum-1;
-      this.nowPage = num;
-    },
-    _list(){
-      var num = this.nowPage;
-      var $this = this;
-      $this.timeArr = [];
-      $this.scoreArr = [];
-      getData('/userDetail','post',{"current": num,"pageLen": this.showNum,"user_id":$this.user_id}).then((res)=>{
-        var data = res.body.data;
-        var timeArr = $this.timeArr;
-        var scoreArr = $this.scoreArr;
-        $this.list = data.userList;
-        $this.list.forEach((v,i,a)=>{
-          var blood = v.blood;
-          if(blood == 0){
-            v.blood = '圆'
-          }else if(blood == 1){
-            v.blood = '三角'
-          }else if(blood == 2){
-            v.blood = '米字'
-          }else if(blood == 3){
-            v.blood = '永字'
-          }else if(blood == 4){
-            v.blood = '兔子'
-          }else if(blood == 5){
-            v.blood = '猫'
-          }
-        })
-        data.userList.forEach((v,i)=>{
-          timeArr.push(v.create_time)
-          scoreArr.push(v.score)
-        })
-        this.drawChart()
-      })
-    },
+    
     routerTo(e){
       var res_id = e.target.parentNode.children[5].innerHTML;
       // this.$router.push({path:'/groupList',query:{groupName:groupName}})

@@ -22,15 +22,7 @@
                 <td class="id">{{item.user_id}}</td>
               </tr>
           </table>
-          <div class="pages">
-            <ul>
-              <li @click="top" v-show="nowPage>2">首页</li>
-              <li @click="up" v-show="nowPage >0">上一页</li>
-              <li @click="changePage" v-for="num in pages" :class="{active : num == nowPage}">{{num+1}}</li>
-              <li @click="down" v-show="nowPage<sum-1">下一页</li>
-              <li @click="bottom" v-show="sum-nowPage >3">尾页</li>
-            </ul>
-          </div>
+          <fenye :user_id="groupId" @setList="getList" sendText="group_id" url="/groupDetail" listName="groupLst"></fenye>
         </div>
       </div>
       <div class="chart">
@@ -46,6 +38,7 @@
 <script>
 import doCookie from '@/server/docookie'
 import getData from '@/server/vue-resource'
+import fenye from '@/components/fenye'
 // 引入echart基本模板
 let echarts = require('echarts/lib/echarts')
 require('echarts/lib/chart/bar')
@@ -71,33 +64,14 @@ export default {
       groupScore:[],
     }
   },
-  mounted:function () {
+  components:{
+    fenye
+  },
+  created:function () {
     var $this = this;
     //获取groupID
-      $this.groupId = $this.$route.query.groupId;
-      getData('/groupDetail','post',{ "current": "0",
-      "pageLen": $this.showNum,"group_id":$this.groupId}).then((res)=>{
-        console.log(res.body.data)
-        var data = res.body.data;
-        var arr = $this.arr;
-        var groupMem = $this.groupMem
-        var groupScore = $this.groupScore
-        // groupMem = [];
-        // groupScore = [];
-        for(let i = 0;i < data.sum;i++){
-          arr.push(i)
-        }
-        $this.list = data.groupLst;
-        $this.sum = data.sum
-        data.groupLst.forEach(function(v,i){
-          groupMem.push(v.uname ? v.uname : v.username)
-          groupScore.push(v.score)
-        })
-        $this.$nextTick(() => {
-          $this.drawChart()
-          // console.log(document.getElementById('myChart'))
-        });
-      })
+    $this.groupId = $this.$route.query.groupId;
+        
     
   },
   methods:{
@@ -112,58 +86,24 @@ export default {
       document.getElementById('qrcode').innerHTML=''
       this.qrcode=false
     },
-    //分页部分
-    changePage(e){
-      var num = e.target.innerHTML -1;
-      this.nowPage = num;
-      
-    },
-    top(){
-     var num = 0;
-    this.nowPage = num;
-      var arr = this.arr
-      var sum = arr.length;
-     
-    },
-    up(){
-      var num = this.nowPage - 1;
-      this.nowPage = num;
-    },
-    down(){
-      var num = this.nowPage + 1;
-      this.nowPage = num;
-    },
-    bottom(){
-      var num = this.sum-1;
-      this.nowPage = num;
-    },
-    _list(){
-      var num = this.nowPage;
+    //从子组件获取数据
+    getList(list){
       var $this = this;
-      this.groupLst = [];
-      this.groupMem = [];
-      getData('/groupDetail','post',{ "current": num,
-      "pageLen": $this.showNum,"group_id":$this.groupId}).then((res)=>{
-        var data = res.body.data;
-        $this.list = data.groupLst;
-        var groupMem = $this.groupMem
-        var groupScore = $this.groupScore
-        data.groupLst.forEach(function(v,i){
-          groupMem.push(v.uname ? v.uname : v.username)
-          groupScore.push(v.score)
-        })
-        $this.$nextTick(() => {
+      this.list = list;
+      $this.groupMem = [];
+      $this.groupScore = [];
+      list.forEach(function(v,i){
+          $this.groupMem.push(v.uname ? v.uname : v.username)
+          $this.groupScore.push(v.score)
           $this.drawChart()
+        })
           // console.log(document.getElementById('myChart'))
-        });
-      })
     },
     routerTo(e){
       var groupName = e.target.parentNode.children[4].innerHTML;
       this.$router.push({path:'/admin/groupList/person',query:{user_id:groupName}})
     },
     drawChart(){
-      console.log(document.getElementById('myChart'))
       // 基于准备好的dom，初始化echarts实例
       let myChart = echarts.init(document.getElementById('myChart'))
       // 绘制图表
@@ -212,27 +152,6 @@ export default {
       });
     }
   },
-    computed:{
-      pages:function () {
-        var num = this.nowPage;
-        var arr = this.arr
-        var sum = arr.length;
-        if(num < 2){
-          return arr.slice(0,5)
-        }else if(num >= sum - 2 ){
-          return arr.slice(sum-5,sum)
-        }else{
-          return arr.slice(num -2,num+3)
-        }
-        
-      },
-      
-    },
-    watch:{
-      nowPage:function () {
-        this._list()
-      }
-    }
 
   
   }
