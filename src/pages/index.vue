@@ -1,7 +1,7 @@
 
 <template>
   <div class="wrapper">
-    <div class="online-num">参与人数{{data.resCount}}</div>
+    <div class="online-num">参与人数{{data.resCount + 400}}</div>
     <my-list :oData="data"></my-list>
     <div class="middle">
       <img src="../assets/logo.jpg" alt="">
